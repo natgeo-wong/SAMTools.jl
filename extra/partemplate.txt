@@ -1,0 +1,41 @@
+# (1)Mode,(2)ID,(3)IDnc,(4)era5,(5)erai,(6)Full,(7)Units
+
+# 2D OUTPUTS (LON,LAT)
+dsfc,u_10m,Surface Zonal Wind (10m),m s^{-1}
+dsfc,v_10m,Surface Meridional Wind (10m),m s^{-1}
+dsfc,t_surf,Surface Temperature,K
+dsfc,temp_2m,Surface Temperature (2m),K
+dsfc,ps,Surface Pressure,Pa
+dsfc,slp,Sea-Level Pressure,Pa
+dsfc,albedo,Surface Albedo,N/A
+dsfc,rrtm_albedo,RRTM Interactive Albedo,N/A
+dsfc,z_pbl,z_pbl,Planetary Boundary Layer Depth,m
+
+# 3D OUTPUTS (LON,LAT,Z)
+msfc,sphum_2m,Surface Specific Humidity (2m),kg kg^{-1}
+msfc,rh_2m,Surface Relative Humidity (2m),kg kg^{-1}
+msfc,ml_heat_cap,Mixed Layer Heat Capacity,J K^{-1} m^{-2}
+msfc,condensation_rain,Rainfall Rate (Condensation),kg m^{-2} s^{-1}
+msfc,convection_rain,Rainfall Rate (Convection),kg m^{-2} s^{-1}
+msfc,precipitation,Precipitation Rate (All),kg m^{-2} s^{-1}
+msfc,cape,Convective Available Potential Energy,J kg^{-1}
+msfc,flux_lhe,Surface Upwards Latent Heat Flux,W m^{2} s^{-1}
+msfc,flux_oceanq,Oceanic Surface Heat Flux,W m^{-2}
+
+# CALCULATED SURFACE PARAMETERS
+csfc,rain,Rainfall Rate (Total),kg m^{-2} s^{-1}
+csfc,snow,Snowfall Rate (Total),kg m^{-2} s^{-1}
+csfc,eke,Eddy Kinetic Energy,kg m^2 s^{-2}
+csfc,tcw,Total Column Water,kg m^{-2}
+
+# CALCULATED PRESSURE PARAMETERS
+cpre,flux_uv,Eddy Momentum Flux,m^2 s^{-2}
+cpre,flux_uT,Zonal Heat Flux,K m s^{-1}
+cpre,flux_vT,Poleward Heat Flux,K m s^{-1}
+cpre,flux_uq,Zonal Moisture Flux,K m s^{-1}
+cpre,flux_vq,Poleward Moisture Flux,K m s^{-1}
+cpre,psi_u,Zonal Streamfunction,kg s^{-1}
+cpre,psi_v,Meridional Streamfunction,kg s^{-1}
+cpre,psi_h,Horizontal Streamfunction,kg s^{-1}
+
+# CUSTOM DEFINED PARAMETERS
