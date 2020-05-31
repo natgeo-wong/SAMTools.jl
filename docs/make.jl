@@ -1,5 +1,5 @@
-using SAMTools
 using Documenter
+using SAMTools
 
 makedocs(;
     modules  = [SAMTools],
