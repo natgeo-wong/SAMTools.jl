@@ -2,15 +2,19 @@ using SAMTools
 using Documenter
 
 makedocs(;
-    modules=[SAMTools],
-    authors="Nathanael Wong <natgeo.wong@outlook.com>",
-    repo="https://github.com/natgeo-wong/SAMTools.jl/blob/{commit}{path}#L{line}",
-    sitename="SAMTools.jl",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        assets=String[],
+    modules  = [SAMTools],
+    doctest  = false,
+    format   = Documenter.HTML(
+        collapselevel = 1,
+        prettyurls    = false
     ),
-    pages=[
+    authors  = "Nathanael Wong <natgeo.wong@outlook.com>",
+    sitename = "SAMTools.jl",
+    pages    = [
         "Home" => "index.md",
     ],
+)
+
+deploydocs(
+    repo = "github.com/natgeo-wong/SAMTools.jl.git",
 )
