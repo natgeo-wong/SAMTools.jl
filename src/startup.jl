@@ -70,8 +70,8 @@ function samroot(;
 end
 
 function samstartup(;
-    tmppath::AbstractString="",
-    prjpath::AbstractString="",
+    tmppath::AbstractString,
+    prjpath::AbstractString,
     experiment::AbstractString="",
     config::AbstractString,
     welcome::Bool=true
@@ -83,9 +83,9 @@ function samstartup(;
         experiment=experiment,config=config
     )
 
-    init = retrievename(tmppath); retrieveruns!(init,sroot)
+    init,fnc = retrievename(tmppath);
 
-    ds = Dataset(fnc);
+    ds = Dataset(fnc[1]);
     init["x"] = ds["x"][:]*1; init["y"] = ds["y"][:]*1;
     init["z"] = ds["z"][:]*1; init["p"] = ds["p"][:]*100;
     close(ds);
@@ -101,7 +101,8 @@ function retrievename(tmppath::AbstractString)
     fname = splitext(fnc[1]);
     init["fstep"] = parse(Int,split(fname,"_")[end]);
     init["fname"] = replace(fname,"_$(init["fstep"])"=>"")
+    init["zeros"] = length(init["fstep"])
 
-    return init
+    return init,fnc
 
 end
