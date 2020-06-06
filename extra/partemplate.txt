@@ -1,41 +1,59 @@
-# (1)Mode,(2)ID,(3)IDnc,(4)era5,(5)erai,(6)Full,(7)Units
+# (1)Mode,(2)ID,(3)IDnc,(4)Full,(6)Units
 
-# 2D OUTPUTS (LON,LAT)
-dsfc,u_10m,Surface Zonal Wind (10m),m s^{-1}
-dsfc,v_10m,Surface Meridional Wind (10m),m s^{-1}
-dsfc,t_surf,Surface Temperature,K
-dsfc,temp_2m,Surface Temperature (2m),K
-dsfc,ps,Surface Pressure,Pa
-dsfc,slp,Sea-Level Pressure,Pa
-dsfc,albedo,Surface Albedo,N/A
-dsfc,rrtm_albedo,RRTM Interactive Albedo,N/A
-dsfc,z_pbl,z_pbl,Planetary Boundary Layer Depth,m
+# 2D DRY OUTPUTS (LON,LAT)
+d2D,u_sfc,USFC,Zonal Wind Component at Surface,m/s
+d2D.u_850,U850,Zonal Wind Component at 850 hPa,m/s
+d2D,u_200,U200,Zonal Wind Component at 200 hPa,m/s
+d2D,v_sfc,VSFC,Meridional Wind Component at Surface,m/s
+d2D.v_850,V850,Meridional Wind Component at 850 hPa,m/s
+d2D,v_200,V200,Meridional Wind Component at 200 hPa,m/s
+d2D,w_500,W500,Vertical Wind Component at 500 hPa,m/s
+d2D,lsm,LANDMASK,Land-Sea Mask,
+d2D,t_sst,SST,Skin Surface Temperature,K
+d2D,p_sfc,PSFC,Surface Pressure,hPa
+
+# 2D RADIATION OUTPUTS (LON,LAT)
+r2D,hflux_s,SHF,Sensible Heat Flux,W/m/m
+r2D,hflux_l,LHF,Latent Heat Flux,W/m/m
+r2D,lw_net_sfc,LWNS,Net Longwave at Surface,W/m/m
+r2D,lw_csky_sfc,LWNSC,Net Clear-Sky Longwave at Surface,W/m/m
+r2D,lw_net_toa,LWNT,Net Longwave at TOA,W/m/m
+r2D,lw_csky_toa,LWNTC,Net Clear-Sky Longwave at TOA,W/m/m
+r2D,sol_net_toa,SOLIN,Net Insolation at TOA,W/m/m
+r2D,sw_net_sfc,SWNS,Net Shortwave at Surface,W/m/m
+r2D,sw_csky,sfc,SWNSC,Net Clear-Sky Shortwave at Surface,W/m/m
+r2D,sw_net_toa,SWNT,Net Shortwave at TOA,W/m/m
+r2D,sw_csky_toa,SWNTC,Net Clear-Sky Shortwave at TOA,W/m/m
+r2D,q_ocn,QOCN,Deep Ocean Cooling,W/m/m
+
+# 2D MOIST OUTPUTS (LON,LAT)
+m2D,cwp,CWP,Cloud Water Path,mm
+m2D,iwp,IWP,Ice Water Path,mm
+m2D,swp,SWVP,Saturated Water Vapour Path,mm
+m2D,tcw,PW,Total Column Water,mm
+m2D,prcp,Prec,Surface Precipitation Rate,mm/day
+m2D,cld_frq,CLD,Cloud Frequency,%
+m2D.cld_top_z,ZC,Cloud Top Height,km
+m2D,cld_top_t,TB,Cloud Top Temperature,K
+m2D,cld_cov,Cloud Cover,
 
 # 3D OUTPUTS (LON,LAT,Z)
-msfc,sphum_2m,Surface Specific Humidity (2m),kg kg^{-1}
-msfc,rh_2m,Surface Relative Humidity (2m),kg kg^{-1}
-msfc,ml_heat_cap,Mixed Layer Heat Capacity,J K^{-1} m^{-2}
-msfc,condensation_rain,Rainfall Rate (Condensation),kg m^{-2} s^{-1}
-msfc,convection_rain,Rainfall Rate (Convection),kg m^{-2} s^{-1}
-msfc,precipitation,Precipitation Rate (All),kg m^{-2} s^{-1}
-msfc,cape,Convective Available Potential Energy,J kg^{-1}
-msfc,flux_lhe,Surface Upwards Latent Heat Flux,W m^{2} s^{-1}
-msfc,flux_oceanq,Oceanic Surface Heat Flux,W m^{-2}
+s3D,u_air,U,Zonal Wind Component,m/s
+s3D,v_air,V,Meridional Wind Component,m/s
+s3D,w_air,W,Vertical Wind Component,m/s
+s3D,p_ptb,PP,Pressure Perturbation,Pa
+s3D,rad_dt,QRAD,Radiative Heating Rate,K/day
+s3D,t_abs,TABS,Temperature,K
+s3D,q_vap,QV,Specific Humidity,g/kg
+s3D,q_con,QN,Non-Precipitating Condensate,g/kg
+s3D,q_prcp,QP,Precipitating Condensate,g/kg
+s3D,cld_ice_rad,REI,Effective Radius for Cloud Ice,mkm
+s3D,cld_liq_rad,REI,Effective Radius for Cloud Liquid,mkm
 
 # CALCULATED SURFACE PARAMETERS
-csfc,rain,Rainfall Rate (Total),kg m^{-2} s^{-1}
-csfc,snow,Snowfall Rate (Total),kg m^{-2} s^{-1}
-csfc,eke,Eddy Kinetic Energy,kg m^2 s^{-2}
-csfc,tcw,Total Column Water,kg m^{-2}
+c2D,
 
 # CALCULATED PRESSURE PARAMETERS
-cpre,flux_uv,Eddy Momentum Flux,m^2 s^{-2}
-cpre,flux_uT,Zonal Heat Flux,K m s^{-1}
-cpre,flux_vT,Poleward Heat Flux,K m s^{-1}
-cpre,flux_uq,Zonal Moisture Flux,K m s^{-1}
-cpre,flux_vq,Poleward Moisture Flux,K m s^{-1}
-cpre,psi_u,Zonal Streamfunction,kg s^{-1}
-cpre,psi_v,Meridional Streamfunction,kg s^{-1}
-cpre,psi_h,Horizontal Streamfunction,kg s^{-1}
+c3D,
 
 # CUSTOM DEFINED PARAMETERS
