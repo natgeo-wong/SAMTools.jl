@@ -2,18 +2,6 @@
 This file initializes the SAMTools module by defining the directories relevant to the particular SAM experiment being resorted and analysed by SAMTools.
 """
 
-function samrootdict()
-
-    sdict = Dict{AbstractString,AbstractString}()
-    sdict["root"] = ""; sdict["tmp"] = ""; sdict["raw"] = ""; sdict["ana"] = "";
-    sdict["experiment"] = ""; sdict["configuration"] = "";
-    sdict["spinup"] = ""; sdict["control"] = "";
-    sdict["ncname"] = "";
-
-    return sdict
-
-end
-
 function samspin(sroot::AbstractDict)
 
     efol = joinpath(sroot["root"],"raw",sroot["experiment"]);
@@ -45,24 +33,36 @@ function samroot(;
     tmppath::AbstractString,
     prjpath::AbstractString,
     experiment::AbstractString="",
-    config::AbstractString
+    config::AbstractString,
+    fname::AbstractString
 )
 
-    sroot = samrootdict();
+    sroot = Dict{AbstractString,AbstractString}()
+
     sroot["tmp"] = tmppath; sroot["root"] = prjpath;
     sroot["raw"] = joinpath(prjpath,"raw",experiment,config)
     sroot["ana"] = joinpath(prjpath,"ana",experiment,config)
     sroot["experiment"] = experiment; sroot["configuration"] = config;
+    sroot["spinup"] = ""; sroot["control"] = ""; sroot["ncname"] = fname;
 
-    @info "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Temporary Directory:")) $tmppath\n  $(BOLD("Root Directory:")) $prjpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
+    @info """$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))
+      $(BOLD("Temporary Directory:")) $tmppath
+      $(BOLD("Project Directory:")) $prjpath
+      $(BOLD("File Prefix:")) $fname
+      $(BOLD("Experiment | Configuration:")) $experiment | $config
+    """
+
+     "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Temporary Directory:")) $tmppath\n  $(BOLD("Root Directory:")) $prjpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
     @info "$(Dates.now()) - SAM RAW DATA directory: $(sroot["raw"])."
     @info "$(Dates.now()) - SAM ANALYSIS directory: $(sroot["ana"])."
 
     if samspin(sroot)
         sroot["spinup"]  = replace(sroot["raw"],config=>"spinup")
         sroot["control"] = replace(sroot["raw"],config=>"control")
-        @info "$(Dates.now()) - SAM SPINUP directory: $(sroot["spinup"])."
-        @info "$(Dates.now()) - SAM CONTROL directory: $(sroot["control"])."
+        @info """$(Dates.now()) - $(BOLD("SPINUP DIRECTORIES:"))
+          $(BOLD("Spinup Directory:"))  $(sroot["spinup"])
+          $(BOLD("Control Directory:")) $(sroot["control"])
+        """
     end
 
     return sroot
