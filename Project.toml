@@ -1,7 +1,7 @@
 name = "SAMTools"
 uuid = "4501d1b7-89e6-4e46-91a8-67bb9f30e2fe"
 authors = ["Nathanael Wong <natgeo.wong@outlook.com>"]
-version = "0.0.2"
+version = "0.0.1"
 
 [deps]
 CFTime = "179af706-886a-5703-950a-314cd64e0468"
