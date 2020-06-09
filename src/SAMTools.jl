@@ -14,9 +14,17 @@ using Statistics
 
 ## Exporting the following functions:
 export
-        samroot
+        samwelcome, samstartup, samresort, samanalysis,
+        samparametercopy, samparameterload, samparameteradd,
+        sampre2lvl, samvert2lvl
 
 ## Including other files in the module
 include("startup.jl")
+include("initialize.jl")
+include("resort.jl")
+include("analysis.jl")
+
+include("frontend.jl")
+include("backend.jl")
 
 end
