@@ -170,24 +170,26 @@ end
 
 function samtime(init)
 
-    itime = deepcopy(init);
-    delete!(itime,"halfs"); delete!(itime,"fulls"); delete!(itime,"sealp");
-    delete!(itime,"lon"); delete!(itime,"lat");
+    stime = deepcopy(init);
+    delete!(stime,"x"); delete!(stime,"y"); delete!(stime,"z"); delete!(stime,"size");
 
-    return itime
+    return stime
 
 end
 
 function saminitialize(
     init::AbstractDict;
     modID::AbstractString, parID::AbstractString,
-    pressure::Real=0
+    height::Real=0
 )
 
-    imod  = sammodule(modID,init);
-    ipar  = samparameter(parID,pressure,imod);
-    itime = samtime(init);
+    if occursin("3D",modID) && pressure == 0 && height == 0
+    end
 
-    return imod,ipar,itime
+    smod  = sammodule(modID,init);
+    spar  = samparameter(parID,smod,zheight=height);
+    stime = samtime(init);
+
+    return smod,spar,stime
 
 end

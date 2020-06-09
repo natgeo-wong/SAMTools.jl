@@ -74,34 +74,38 @@ function samstartup(;
     prjpath::AbstractString,
     experiment::AbstractString="",
     config::AbstractString,
+    fname::AbstractString,
     welcome::Bool=true
 )
 
     if welcome; samwelcome() end
     sroot = samroot(;
         tmppath=tmppath,prjpath=prjpath,
-        experiment=experiment,config=config
+        experiment=experiment,config=config,
+        fname=fname
     )
 
-    init,fnc = retrievename(tmppath);
+    init,fnc = retrievename(fname,tmppath); sroot["flist"] = fnc;
 
     ds = Dataset(fnc[1]);
-    init["x"] = ds["x"][:]*1; init["y"] = ds["y"][:]*1;
-    init["z"] = ds["z"][:]*1; init["p"] = ds["p"][:]*100;
+    init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
+    init["z"] = ds["z"][:]; init["t"] = ds["time"][:]
+    init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
     close(ds);
+
+    nz = init["size"][3]; nfnc = length(fnc); p = zeros(nz,nfnc)
+
+    for inc in 1 : nfnc; ds = Dataset(fnc[inc]); p[:,inc] = ds["p"][:]; close(ds) end
 
     return init,sroot
 
 end
 
-function retrievename(tmppath::AbstractString)
+function retrievename(fname::AbstractString,tmppath::AbstractString)
 
-    init  = Dict{AbstractString,Any}()
-    fnc   = glob(tmppath,"*.nc"); nfid = length(fnc); init["ntime"] = nfid
-    fname = splitext(fnc[1]);
-    init["fstep"] = parse(Int,split(fname,"_")[end]);
-    init["fname"] = replace(fname,"_$(init["fstep"])"=>"")
-    init["zeros"] = length(init["fstep"])
+    init = Dict{AbstractString,Any}()
+    fnc  = glob("$(fname)*.nc",tmppath);
+    nfid = length(fnc); init["ntime"] = nfid
 
     return init,fnc
 
