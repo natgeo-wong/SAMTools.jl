@@ -97,37 +97,41 @@ end
 
 function sammodule(moduleID::AbstractString,init::AbstractDict)
 
-    imod = Dict{AbstractString,Any}()
-    imod["moduletype"] = moduleID;
+    smod = Dict{AbstractString,Any}()
+    smod["moduletype"] = moduleID;
 
-    if     moduleID == "d2D"; imod["modulename"] = "dry 2D";
-    elseif moduleID == "r2D"; imod["modulename"] = "radiation 2D";
-    elseif moduleID == "m2D"; imod["modulename"] = "moist 2D";
-    elseif moduleID == "s3D"; imod["modulename"] = "general 3D";
-    elseif moduleID == "c2D"; imod["modulename"] = "calc 2D";
-    elseif moduleID == "c3D"; imod["modulename"] = "calc 3D";
+    if     moduleID == "d2D"; smod["modulename"] = "dry 2D";
+    elseif moduleID == "r2D"; smod["modulename"] = "radiation 2D";
+    elseif moduleID == "m2D"; smod["modulename"] = "moist 2D";
+    elseif moduleID == "s3D"; smod["modulename"] = "general 3D";
+    elseif moduleID == "c2D"; smod["modulename"] = "calc 2D";
+    elseif moduleID == "c3D"; smod["modulename"] = "calc 3D";
     end
 
     if occursin("2D",moduleID)
         @debug "$(Dates.now()) - A 2D module was selected, and therefore we will save '2D' into the parameter level Dictionary."
-        imod["levels"] = ["2D"];
+        smod["levels"] = ["2D"];
     else
         @debug "$(Dates.now()) - A pressure module was selected, and therefore all available pressure levels will be saved into the parameter Dictionary."
-        imod["levels"] = init["p"]
+        smod["levels"] = init["p"]
     end
 
-    imod["z"] = init["z"];
+    smod["x"] = init["x"]; smod["y"] = init["y"]; smod["z"] = init["z"];
+    smod["size"] = init["size"];
 
-    return imod
+    return smod
 
 end
 
-function samparameter(parameterID::AbstractString,pressure::Real,imod::AbstractDict)
+function samparameter(
+    parameterID::AbstractString, smod::AbstractDict;
+    zheight::Real
+)
 
-    parlist = samparameterload(imod); mtype = imod["moduletype"];
+    parlist = samparameterload(smod); mtype = smod["moduletype"];
 
     if sum(parlist[:,2] .== parameterID) == 0
-        error("$(Dates.now()) - Invalid parameter choice for \"$(uppercase(mtype))\".  Call queryipar(modID=$(mtype),parID=$(parameterID)) for more information.")
+        error("$(Dates.now()) - Invalid parameter choice for \"$(uppercase(mtype))\".  Call queryspar(modID=$(mtype),parID=$(parameterID)) for more information.")
     else
         ID = (parlist[:,2] .== parameterID);
     end
@@ -135,31 +139,38 @@ function samparameter(parameterID::AbstractString,pressure::Real,imod::AbstractD
     parinfo = parlist[ID,:];
     @info "$(Dates.now()) - samTools will analyze $(parinfo[3]) data."
 
-    if occursin("sfc",mtype)
+    if occursin("2D",mtype)
 
-        if pressure != 0
-            @warn "$(Dates.now()) - You asked to analyze data at pressure $(pressure) Pa but have chosen a surface module variable.  Setting pressure level to \"SFC\" by default"
+        if zheight != 0
+            @warn "$(Dates.now()) - You asked to analyze data at a vertical height of $(zheight) m but have chosen a surface module variable.  Setting vertical level to \"SFC\" by default"
         end
-        return Dict("ID"=>parinfo[2],"name"=>parinfo[3],"unit"=>parinfo[4],"level"=>"sfc");
+        return Dict(
+            "ID"=>parinfo[2],"IDnc"=>parinfo[3],
+            "name"=>parinfo[4],"unit"=>parinfo[5],
+            "level"=>"sfc"
+        );
 
     else
 
-        if pressure == 0
+        if zheight != 0
 
-            @warn "$(Dates.now()) - You defined a pressure module \"$(uppercase(mtype))\" but you did not specify a pressure.  Setting pressure level to \"ALL\" - this may prevent usage of some samTool functionalities."
+            lvl = samvert2lvl(zheight,smod)
+            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at the vertical height $(zheight) m.  Based on the given vertical levels, this corresponds to z-level $lvl out of $(length(smod["levels"]))."
+
             return Dict(
-                "ID"=>parinfo[2],"name"=>parinfo[3],
-                "unit"=>parinfo[4],"level"=>"all"
+                "ID"=>parinfo[2],"IDnc"=>parinfo[3],
+                "name"=>parinfo[4],"unit"=>parinfo[5],
+                "level"=>lvl
             );
 
         else
 
-            lvl = sampre2lvl(pressure,imod)
-            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at pressure $(pressure) Pa.  Based on a reference pressure of $(imod["sealp"]) Pa, this corresponds to σ-level $lvl out of $(length(imod["levels"]))."
+            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[3])) data, which is found as a 3D module but have not specified a level.  Since SAM is a CRM and is likely run with high resolution, SAMTools.jl will analyse each vertical level independently for its RESORT and ANALYSIS functionalities."
 
             return Dict(
-                "ID"=>parinfo[2],"name"=>parinfo[3],
-                "unit"=>parinfo[4],"level"=>lvl
+                "ID"=>parinfo[2],"IDnc"=>parinfo[3],
+                "name"=>parinfo[4],"unit"=>parinfo[5],
+                "level"=>"all"
             );
 
         end
