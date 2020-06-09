@@ -52,7 +52,7 @@ function samresortsave(
 )
 
     inc,it,ilvl = runinfo; mtype = smod["moduletype"]
-    rfnc = samrawname(smod,spar,irun=inc,ilvl=ilvl));
+    rfnc = samrawname(smod,spar,irun=inc,ilvl=ilvl);
     if isfile(fnc)
         @info "$(Dates.now()) - Stale NetCDF file $(fnc) detected.  Overwriting ..."
         rm(fnc);
