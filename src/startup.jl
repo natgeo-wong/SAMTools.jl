@@ -93,9 +93,23 @@ function samstartup(;
     init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
     close(ds);
 
-    nz = init["size"][3]; nfnc = length(fnc); p = zeros(nz,nfnc)
-
+    nz = init["size"][3]; nfnc = length(fnc); nruns = mod(nfnc,360)+1;
+    p = zeros(nz,360*nruns)
     for inc in 1 : nfnc; ds = Dataset(fnc[inc]); p[:,inc] = ds["p"][:]; close(ds) end
+    scale,offset = samncoffsetscale(p); p = reshape(p,nfnc,360,:)*100;
+
+    ds = Dataset("p.nc","c")
+    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["runs"] = nruns
+    ncp = defVar(ds,"p",Int16,("z","t","nruns"),attrib = Dict(
+        "units"         => "Pa",
+        "long_name"     => "Pressure",
+        "scale_factor"  => scale,
+        "add_offset"    => offset,
+        "_FillValue"    => Int16(-32767),
+        "missing_value" => Int16(-32767),
+    ))
+    ncp[:] = p
+    close(ds)
 
     return init,sroot
 
