@@ -137,7 +137,7 @@ function samparameter(
     end
 
     parinfo = parlist[ID,:];
-    @info "$(Dates.now()) - samTools will analyze $(parinfo[3]) data."
+    @info "$(Dates.now()) - SAMTools will analyze $(parinfo[4]) data."
 
     if occursin("2D",mtype)
 

@@ -4,25 +4,26 @@ function samresort2D(
 )
 
     nt = length(stime["t2D"]); it = 360; nfnc = floor(nt/it) + 1; tt = 0;
-    nx,ny,nz = smod["size"]; data = Array{Float32,4}(undef,nx,ny,it);
+    nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
 
     for inc = 1 : nfnc
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
 
-        ids1 = floor(((inc-1)*360+1)/1000); ids2 = floor((inc*360)/1000)
-        beg  = mod((inc-1)*360+1,1000);
-        fin  = mod(inc*360,1000);
+        ids1 = convert(Int64,floor(((inc-1)*360+1)/1000)) + 1;
+        ids2 = convert(Int64,floor((inc*360)/1000)) + 1;
+        beg  = convert(Int64,mod((inc-1)*360+1,1000));
+        fin  = convert(Int64,mod(inc*360,1000));
 
         if ids1 == ids2
-            ds1 = Dataset(sroot["flist3D"][ids1])
-            data .= ds[spar["IDnc"]][:,:,beg:fin]
+            ds1 = Dataset(sroot["flist2D"][ids1])
+            data .= ds1[spar["IDnc"]][:,:,beg:fin]
             close(ds1)
         else
-            ds1 = Dataset(sroot["flist3D"][ids1])
-            ds2 = Dataset(sroot["flist3D"][ids2])
+            ds1 = Dataset(sroot["flist2D"][ids1])
+            ds2 = Dataset(sroot["flist2D"][ids2])
             data[:,:,1:(360-fin)]   .= ds1[spar["IDnc"]][:,:,beg:end]
-            data[:,:,(361-fin):end] .= ds1[spar["IDnc"]][:,:,1:fin]
+            data[:,:,(361-fin):end] .= ds2[spar["IDnc"]][:,:,1:fin]
             close(ds1); close(ds2)
         end
 
@@ -38,7 +39,7 @@ function samresort3D(
 )
 
     nt = stime["ntime"]; it = 360; nfnc = floor(nt/it) + 1; tt = 0;
-    nx,ny,nz = smod["size"]; data = Array{Float32,4}(undef,nx,ny,it);
+    nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
     lvl = spar["level"]; if lvl == "all"; lvl = collect(1:nz) end
 
     for ilvl in lvl, inc = 1 : nfnc
@@ -142,7 +143,7 @@ function samresort(
 end
 
 function samresort(
-    init::AbstractDict, sroot::AbstractString;
+    init::AbstractDict, sroot::AbstractDict;
     modID::AbstractString, parID::AbstractString,
     height::Real=0
 )
