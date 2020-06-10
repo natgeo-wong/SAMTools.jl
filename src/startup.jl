@@ -91,15 +91,16 @@ function samstartup(;
 
     ds = Dataset(f3D[1]);
     init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
-    init["z"] = ds["z"][:]; init["t3D"] = ds["time"][:]
+    init["z"] = ds["z"][:]; t3D = ds["time"][1]
     init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
     close(ds);
 
     ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
 
-    init["tbegin"]  = 2*init["t3D"][1] - init["t3D"][2]
+    init["tbegin"]  = 2*init["t2D"][1] - init["t2D"][2]
     init["tstep2D"] = init["t2D"][2] - init["t2D"][1]
-    init["tstep3D"] = init["t3D"][2] - init["t3D"][1]
+    init["tstep3D"] = t3D - init["tbegin"]
+    init["t3D"] = init["tbegin"] .+ collect(1:init["tbegin"]) * init["tstep3D"]
 
 
     nz = init["size"][3]; nf3D = length(f3D); n3Drun = mod(nf3D,360)+1;
