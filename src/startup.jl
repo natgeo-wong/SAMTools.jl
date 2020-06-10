@@ -85,13 +85,21 @@ function samstartup(;
         fname=fname
     )
 
-    init,fnc = retrievename(fname,tmppath); sroot["flist"] = fnc;
+    init,f3D,f2D = retrievename(fname,tmppath);
+    sroot["flist3D"] = f3D;
+    sroot["flist2D"] = f2D[1];
 
-    ds = Dataset(fnc[1]);
+    ds = Dataset(f3D[1]);
     init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
-    init["z"] = ds["z"][:]; init["t"] = ds["time"][:]
+    init["z"] = ds["z"][:]; init["t3D"] = ds["time"][:]
     init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
     close(ds);
+
+    ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
+    init["tbegin"]  = 2*init["t3D"][1] - init["t3D"][2]
+    init["tstep2D"] = init["t2D"][2] - init["t2D"][1]
+    init["tstep3D"] = init["t3D"][2] - init["t3D"][1]
+
 
     nz = init["size"][3]; nfnc = length(fnc); nruns = mod(nfnc,360)+1;
     p = zeros(nz,360*nruns)
@@ -118,9 +126,10 @@ end
 function retrievename(fname::AbstractString,tmppath::AbstractString)
 
     init = Dict{AbstractString,Any}()
-    fnc  = glob("$(fname)*.nc",tmppath);
-    nfid = length(fnc); init["ntime"] = nfid
+    f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
+    f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
+    nfid = length(f3D); init["ntime"] = nfid
 
-    return init,fnc
+    return init,f3D,f2D
 
 end
