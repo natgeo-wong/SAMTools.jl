@@ -3,21 +3,18 @@ function samresort2D(
     sroot::AbstractDict
 )
 
-    nt = stime["ntime"]; it = 360; nfnc = floor(nt/it) + 1; tt = 0;
+    nt = length(stime["t2D"]); it = 360; nfnc = floor(nt/it) + 1; tt = 0;
     nx,ny,nz = smod["size"]; data = Array{Float32,4}(undef,nx,ny,it);
+    ds = Dataset(sroot["flist2D"])
 
     for inc = 1 : nfnc
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
-        for ii = 1 : it; tt = tt + 1;
-            ds = Dataset(sroot["flist"][tt])
-            data[:,:,ii] .= ds[spar["IDnc"]][:,:,1]
-            close(ds)
-        end
-
+        for ii = 1 : it; tt = tt + 1; data[:,:,ii] .= ds[spar["IDnc"]][:,:,tt] end
         samresortsave(data,[inc,it,0],smod,spar,stime,sroot)
 
     end
+    close(ds)
 
 end
 
@@ -34,7 +31,7 @@ function samresort3D(
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
         for ii = 1 : it; tt = tt + 1;
-            ds = Dataset(sroot["flist"][tt])
+            ds = Dataset(sroot["flist3D"][tt])
             data[:,:,ii] .= ds[spar["IDnc"]][:,:,ilvl,1]
             close(ds)
         end
@@ -106,7 +103,12 @@ function samresortsave(
     ncx[:] = smod["x"]
     ncy[:] = smod["y"]
     if occursin("2D",mtype); ncz[:] = smod["z"][ilvl] end
-    nct[:] = ((inc-1) .+ collect(1:it)) * stime["t"]
+
+    if occursin("2D",mtype)
+          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["t2Dstep"] + stime["tbegin"]
+    else; nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["t3Dstep"] + stime["tbegin"]
+    end
+
     ncv[:] = data;
 
     close(ds)
