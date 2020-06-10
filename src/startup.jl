@@ -89,7 +89,7 @@ function samstartup(;
     sroot["flist3D"] = f3D;
     sroot["flist2D"] = f2D;
 
-    ds = Dataset(f3D[1]);
+    ds = Dataset(f3D[end]);
     init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
     init["z"] = ds["z"][:]; t3D = ds["time"][1]
     init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
@@ -98,9 +98,9 @@ function samstartup(;
     ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
 
     init["tbegin"]  = 2*init["t2D"][1] - init["t2D"][2]
-    init["tstep2D"] = init["t2D"][2] - init["t2D"][1]
-    init["tstep3D"] = t3D - init["tbegin"]
-    init["t3D"] = init["tbegin"] .+ collect(1:init["tbegin"]) * init["tstep3D"]
+    init["tstep2D"] = (init["t2D"][end] - init["t2D"][1]) / (length(init["t2D"]) - 1)
+    init["tstep3D"] = (t3D - init["tbegin"]) / length(f3D)
+    init["t3D"] = init["tbegin"] .+ collect(1:length(f3D)) * init["tstep3D"]
 
 
     nz = init["size"][3]; nf3D = length(f3D); n3Drun = floor(Int64,nf3D/360)+1;
