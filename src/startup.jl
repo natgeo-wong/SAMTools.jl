@@ -69,6 +69,86 @@ function samroot(;
 
 end
 
+function retrievename(fname::AbstractString,tmppath::AbstractString)
+
+    init = Dict{AbstractString,Any}()
+    f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
+    f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
+    nf2D = length(f2D); init["n2Dtime"] = nf2D
+    nf3D = length(f3D); init["n3Dtime"] = nf3D
+
+    return init,f3D,f2D
+
+end
+
+function retrievetime!(
+    init::AbstractDict,
+    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString}
+    t3D::Real
+)
+
+    ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
+
+    init["tbegin"]  = 2*init["t2D"][1] - init["t2D"][2]
+    init["tstep2D"] = (init["t2D"][end] - init["t2D"][1]) / (length(init["t2D"]) - 1)
+    init["tstep3D"] = (t3D - init["tbegin"]) / length(f3D)
+    init["t3D"] = init["tbegin"] .+ collect(1:length(f3D)) * init["tstep3D"]
+
+    return
+
+end
+
+function retrievedims(
+    init::AbstractDict,
+    f3D::Vector{<:AbstractString}
+)
+
+    ds = Dataset(f3D[end]);
+    init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
+    init["z"] = ds["z"][:]; t3D = ds["time"][1]
+    init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
+    close(ds);
+
+    return init,t3D
+
+end
+
+function extractpressure!(
+    init::AbstractDict
+    f3D::Vector{<:AbstractString},
+    sroot::AbstractDict
+)
+
+    nz = init["size"][3]; nf3D = length(f3D); n3Drun = floor(Int64,nf3D/360)+1;
+    p = zeros(nz,360*n3Drun)
+    for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
+    p = reshape(p,nz,360,n3Drun)*100; scale,offset = samncoffsetscale(p);
+
+    if !isdir(sroot["raw"]); mkpath(sroot["raw"]); end
+    if !isdir(sroot["ana"]); mkpath(sroot["ana"]); end
+
+    fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset("p.nc","c")
+    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
+    ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
+        "units"         => "Pa",
+        "long_name"     => "Pressure",
+    ))
+    ncp[:] = p
+    close(ds)
+
+    fp = joinpath(sroot["ana"],"p.nc"); ds = Dataset("p.nc","c")
+    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
+    ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
+        "units"         => "Pa",
+        "long_name"     => "Pressure",
+    ))
+    ncp[:] = p
+    close(ds)
+
+    return
+
+end
+
 function samstartup(;
     tmppath::AbstractString,
     prjpath::AbstractString,
@@ -86,53 +166,10 @@ function samstartup(;
     )
 
     init,f3D,f2D = retrievename(fname,tmppath);
-    sroot["flist3D"] = f3D;
-    sroot["flist2D"] = f2D;
-
-    ds = Dataset(f3D[end]);
-    init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
-    init["z"] = ds["z"][:]; t3D = ds["time"][1]
-    init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
-    close(ds);
-
-    ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
-
-    init["tbegin"]  = 2*init["t2D"][1] - init["t2D"][2]
-    init["tstep2D"] = (init["t2D"][end] - init["t2D"][1]) / (length(init["t2D"]) - 1)
-    init["tstep3D"] = (t3D - init["tbegin"]) / length(f3D)
-    init["t3D"] = init["tbegin"] .+ collect(1:length(f3D)) * init["tstep3D"]
-
-
-    nz = init["size"][3]; nf3D = length(f3D); n3Drun = floor(Int64,nf3D/360)+1;
-    p = zeros(nz,360*n3Drun)
-    for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
-    p = reshape(p,nz,360,n3Drun)*100; scale,offset = samncoffsetscale(p);
-
-    ds = Dataset("p.nc","c")
-    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
-    ncp = defVar(ds,"p",Int16,("z","t","nruns"),attrib = Dict(
-        "units"         => "Pa",
-        "long_name"     => "Pressure",
-        "scale_factor"  => scale,
-        "add_offset"    => offset,
-        "_FillValue"    => Int16(-32767),
-        "missing_value" => Int16(-32767),
-    ))
-    ncp[:] = p
-    close(ds)
+    sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
+    init,t3D = retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,t3D)
+    extractpressure!(init,f3D,sroot)
 
     return init,sroot
-
-end
-
-function retrievename(fname::AbstractString,tmppath::AbstractString)
-
-    init = Dict{AbstractString,Any}()
-    f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
-    f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
-    nf2D = length(f2D); init["n2Dtime"] = nf2D
-    nf3D = length(f3D); init["n3Dtime"] = nf3D
-
-    return init,f3D,f2D
 
 end
