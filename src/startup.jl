@@ -48,13 +48,11 @@ function samroot(;
     @info """$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))
       $(BOLD("Temporary Directory:")) $tmppath
       $(BOLD("Project Directory:")) $prjpath
+      $(BOLD("Raw Data Directory:")) $(sroot["raw"])
+      $(BOLD("Analysis Directory:")) $(sroot["ana"])
       $(BOLD("File Prefix:")) $fname
       $(BOLD("Experiment | Configuration:")) $experiment | $config
     """
-
-     "$(Dates.now()) - $(BOLD("PROJECT DETAILS:"))\n  $(BOLD("Temporary Directory:")) $tmppath\n  $(BOLD("Root Directory:")) $prjpath\n  $(BOLD("Experiment:")) $experiment\n  $(BOLD("Configuration:")) $config"
-    @info "$(Dates.now()) - SAM RAW DATA directory: $(sroot["raw"])."
-    @info "$(Dates.now()) - SAM ANALYSIS directory: $(sroot["ana"])."
 
     if samspin(sroot)
         sroot["spinup"]  = replace(sroot["raw"],config=>"spinup")
@@ -71,6 +69,8 @@ end
 
 function retrievename(fname::AbstractString,tmppath::AbstractString)
 
+    @info "$(Dates.now()) - Retrieving list of 2D and 3D NetCDF output files ..."
+
     init = Dict{AbstractString,Any}()
     f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
     f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
@@ -83,9 +83,11 @@ end
 
 function retrievetime!(
     init::AbstractDict,
-    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString}
+    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString},
     t3D::Real
 )
+
+    @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
 
     ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
 
@@ -103,6 +105,8 @@ function retrievedims(
     f3D::Vector{<:AbstractString}
 )
 
+    @info "$(Dates.now()) - Retrieving X,Y,Z-dimensions of data output ..."
+
     ds = Dataset(f3D[end]);
     init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
     init["z"] = ds["z"][:]; t3D = ds["time"][1]
@@ -114,7 +118,7 @@ function retrievedims(
 end
 
 function extractpressure!(
-    init::AbstractDict
+    init::AbstractDict,
     f3D::Vector{<:AbstractString},
     sroot::AbstractDict
 )
@@ -167,7 +171,7 @@ function samstartup(;
 
     init,f3D,f2D = retrievename(fname,tmppath);
     sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
-    init,t3D = retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,t3D)
+    init,t3D = retrievedims(init,f3D); retrievetime!(init,f3D,f2D,t3D)
     extractpressure!(init,f3D,sroot)
 
     return init,sroot
