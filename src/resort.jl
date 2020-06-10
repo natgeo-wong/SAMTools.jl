@@ -5,16 +5,21 @@ function samresort2D(
 
     nt = length(stime["t2D"]); it = 360; nfnc = floor(nt/it) + 1; tt = 0;
     nx,ny,nz = smod["size"]; data = Array{Float32,4}(undef,nx,ny,it);
-    ds = Dataset(sroot["flist2D"])
 
     for inc = 1 : nfnc
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
-        for ii = 1 : it; tt = tt + 1; data[:,:,ii] .= ds[spar["IDnc"]][:,:,tt] end
+
+        for ii = 1 : it
+            tt = tt + 1; ids = floor(tt,1000) + 1
+            ds = Dataset(sroot["flist2D"][ids])
+            data[:,:,ii] .= ds[spar["IDnc"]][:,:,tt]
+            close(ds)
+        end
+
         samresortsave(data,[inc,it,0],smod,spar,stime,sroot)
 
     end
-    close(ds)
 
 end
 

@@ -87,7 +87,7 @@ function samstartup(;
 
     init,f3D,f2D = retrievename(fname,tmppath);
     sroot["flist3D"] = f3D;
-    sroot["flist2D"] = f2D[1];
+    sroot["flist2D"] = f2D;
 
     ds = Dataset(f3D[1]);
     init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
@@ -96,18 +96,19 @@ function samstartup(;
     close(ds);
 
     ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
+
     init["tbegin"]  = 2*init["t3D"][1] - init["t3D"][2]
     init["tstep2D"] = init["t2D"][2] - init["t2D"][1]
     init["tstep3D"] = init["t3D"][2] - init["t3D"][1]
 
 
-    nz = init["size"][3]; nfnc = length(fnc); nruns = mod(nfnc,360)+1;
-    p = zeros(nz,360*nruns)
-    for inc in 1 : nfnc; ds = Dataset(fnc[inc]); p[:,inc] = ds["p"][:]; close(ds) end
-    scale,offset = samncoffsetscale(p); p = reshape(p,nfnc,360,:)*100;
+    nz = init["size"][3]; nf3D = length(f3D); n3Drun = mod(nf3D,360)+1;
+    p = zeros(nz,360*n3Drun)
+    for inc in 1 : n3Drun; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
+    scale,offset = samncoffsetscale(p); p = reshape(p,nf3D,360,:)*100;
 
     ds = Dataset("p.nc","c")
-    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["runs"] = nruns
+    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["runs"] = n3Drun
     ncp = defVar(ds,"p",Int16,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
         "long_name"     => "Pressure",
@@ -128,7 +129,8 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
     init = Dict{AbstractString,Any}()
     f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
     f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
-    nfid = length(f3D); init["ntime"] = nfid
+    nf2D = length(f2D); init["n2Dtime"] = nfid
+    nf3D = length(f3D); init["n3Dtime"] = nfid
 
     return init,f3D,f2D
 
