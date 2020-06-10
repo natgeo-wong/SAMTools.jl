@@ -37,7 +37,7 @@ function samroot(;
     fname::AbstractString
 )
 
-    sroot = Dict{AbstractString,AbstractString}()
+    sroot = Dict{AbstractString,Any}()
 
     sroot["tmp"] = tmppath; sroot["root"] = prjpath;
     sroot["raw"] = joinpath(prjpath,"raw",experiment,config)
@@ -129,8 +129,8 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
     init = Dict{AbstractString,Any}()
     f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
     f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
-    nf2D = length(f2D); init["n2Dtime"] = nfid
-    nf3D = length(f3D); init["n3Dtime"] = nfid
+    nf2D = length(f2D); init["n2Dtime"] = nf2D
+    nf3D = length(f3D); init["n3Dtime"] = nf3D
 
     return init,f3D,f2D
 
