@@ -10,11 +10,20 @@ function samresort2D(
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
 
-        for ii = 1 : it
-            tt = tt + 1; ids = floor(tt,1000) + 1
-            ds = Dataset(sroot["flist2D"][ids])
-            data[:,:,ii] .= ds[spar["IDnc"]][:,:,tt]
-            close(ds)
+        ids1 = floor(((inc-1)*360+1)/1000); ids2 = floor((inc*360)/1000)
+        beg  = mod((inc-1)*360+1,1000);
+        fin  = mod(inc*360,1000);
+
+        if ids1 == ids2
+            ds1 = Dataset(sroot["flist3D"][ids1])
+            data .= ds[spar["IDnc"]][:,:,beg:fin]
+            close(ds1)
+        else
+            ds1 = Dataset(sroot["flist3D"][ids1])
+            ds2 = Dataset(sroot["flist3D"][ids2])
+            data[:,:,1:(360-fin)]   .= ds1[spar["IDnc"]][:,:,beg:end]
+            data[:,:,(361-fin):end] .= ds1[spar["IDnc"]][:,:,1:fin]
+            close(ds1); close(ds2)
         end
 
         samresortsave(data,[inc,it,0],smod,spar,stime,sroot)
