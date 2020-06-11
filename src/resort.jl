@@ -8,7 +8,7 @@ function samresort2D(
 
     for inc = 1 : nfnc
 
-        if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
+        if inc == nfnc; it = mod(nt,it); data = Array{Float32,3}(undef,nx,ny,it) end
 
         ids1 = convert(Int64,floor(((inc-1)*360+1)/1000)) + 1;
         ids2 = convert(Int64,floor((inc*360)/1000)) + 1;
@@ -44,7 +44,7 @@ function samresort3D(
 
     for ilvl in lvl, inc = 1 : nfnc; spar["level"] = ilvl
 
-        if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
+        if inc == nfnc; it = mod(nt,it); data = Array{Float32,3}(undef,nx,ny,it) end
         for ii = 1 : it; tt = tt + 1;
             ds = Dataset(sroot["flist3D"][tt])
             data[:,:,ii] .= ds[spar["IDnc"]][:,:,ilvl,1]
