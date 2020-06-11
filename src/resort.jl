@@ -56,7 +56,11 @@ function samresort3D(
 
     for ilvl in lvl, inc = 1 : nfnc; spar["level"] = ilvl
 
-        if inc == nfnc; it = mod(nt,it); data = Array{Float32,3}(undef,nx,ny,it) end
+        if inc == nfnc
+            it = mod(nt,it); if it == 0; it = 360; end
+            data = Array{Float32,3}(undef,nx,ny,it)
+        end
+        
         for ii = 1 : it; tt = tt + 1;
             ds = Dataset(sroot["flist3D"][tt])
             data[:,:,ii] .= ds[spar["IDnc"]][:,:,ilvl,1]

@@ -146,7 +146,7 @@ function extractpressure!(
 
     @info "$(Dates.now()) - Saving pressure coordinate information ..."
 
-    fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset("p.nc","c")
+    fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset(fp,"c")
     ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
     ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
@@ -155,7 +155,7 @@ function extractpressure!(
     ncp[:] = p
     close(ds)
 
-    fp = joinpath(sroot["ana"],"p.nc"); ds = Dataset("p.nc","c")
+    fp = joinpath(sroot["ana"],"p.nc"); ds = Dataset(fp,"c")
     ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
     ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
