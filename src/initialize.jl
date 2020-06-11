@@ -147,7 +147,7 @@ function samparameter(
         return Dict(
             "ID"=>parinfo[2],"IDnc"=>parinfo[3],
             "name"=>parinfo[4],"unit"=>parinfo[5],
-            "level"=>"sfc"
+            "level"=>0
         );
 
     else

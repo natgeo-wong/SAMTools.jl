@@ -27,7 +27,7 @@ function samresort2D(
             close(ds1); close(ds2)
         end
 
-        samresortsave(data,[inc,it,0],smod,spar,stime,sroot)
+        samresortsave(data,[inc,it],smod,spar,stime,sroot)
 
     end
 
@@ -42,7 +42,7 @@ function samresort3D(
     nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
     lvl = spar["level"]; if lvl == "all"; lvl = collect(1:nz) end
 
-    for ilvl in lvl, inc = 1 : nfnc
+    for ilvl in lvl, inc = 1 : nfnc; spar["level"] = ilvl
 
         if inc == nfnc; it = mod(nt,it); data = Array{Int16,3}(undef,nx,ny,it) end
         for ii = 1 : it; tt = tt + 1;
@@ -51,7 +51,7 @@ function samresort3D(
             close(ds)
         end
 
-        samresortsave(data,[inc,it,ilvl],smod,spar,stime,sroot)
+        samresortsave(data,[inc,it],smod,spar,stime,sroot)
 
     end
 
@@ -63,8 +63,8 @@ function samresortsave(
     sroot::AbstractDict
 )
 
-    inc,it,ilvl = runinfo; mtype = smod["moduletype"]
-    rfnc = samrawname(smod,spar,irun=inc,ilvl=ilvl);
+    inc,it = runinfo; mtype = smod["moduletype"]
+    rfnc = samrawname(spar,sroot,irun=inc);
     if isfile(fnc)
         @info "$(Dates.now()) - Stale NetCDF file $(fnc) detected.  Overwriting ..."
         rm(fnc);
@@ -96,7 +96,7 @@ function samresortsave(
         ncz = defVar(ds,"z",Int16,("z",),attrib = Dict(
             "units"     => "km",
             "long_name" => "Z",
-            "level"     => ilvl
+            "level"     => spar["level"]
         ))
     end
 
@@ -117,7 +117,7 @@ function samresortsave(
 
     ncx[:] = smod["x"]
     ncy[:] = smod["y"]
-    if occursin("2D",mtype); ncz[:] = smod["z"][ilvl] end
+    if occursin("2D",mtype); ncz[:] = smod["z"][spar["level"]] end
 
     if occursin("2D",mtype)
           nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["t2Dstep"] + stime["tbegin"]
