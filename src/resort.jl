@@ -65,12 +65,12 @@ function samresortsave(
 
     inc,it = runinfo; mtype = smod["moduletype"]
     rfnc = samrawname(spar,sroot,irun=inc);
-    if isfile(fnc)
-        @info "$(Dates.now()) - Stale NetCDF file $(fnc) detected.  Overwriting ..."
-        rm(fnc);
+    if isfile(rfnc)
+        @info "$(Dates.now()) - Stale NetCDF file $(rfnc) detected.  Overwriting ..."
+        rm(rfnc);
     end
 
-    ds = NCDataset(fnc,"c",attrib = Dict(
+    ds = NCDataset(rfnc,"c",attrib = Dict(
         "Conventions"  => "CF-1.6",
         "Date Created" => "$(Dates.now())"
     ))
