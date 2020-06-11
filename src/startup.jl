@@ -134,6 +134,8 @@ function extractpressure!(
     sroot::AbstractDict
 )
 
+    @info "$(Dates.now()) - Retrieving details on pressure coordinates over the course of the experiment ..."
+
     nz = init["size"][3]; nf3D = length(f3D); n3Drun = floor(Int64,nf3D/360)+1;
     p = zeros(nz,360*n3Drun)
     for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
@@ -141,6 +143,8 @@ function extractpressure!(
 
     if !isdir(sroot["raw"]); mkpath(sroot["raw"]); end
     if !isdir(sroot["ana"]); mkpath(sroot["ana"]); end
+
+    @info "$(Dates.now()) - Saving pressure coordinate information ..."
 
     fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset("p.nc","c")
     ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
