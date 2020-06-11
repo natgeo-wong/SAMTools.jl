@@ -14,6 +14,8 @@ function samresort2D(
         ids2 = convert(Int64,floor((inc*360)/1000)) + 1;
         beg  = convert(Int64,mod((inc-1)*360+1,1000));
         fin  = convert(Int64,mod(inc*360,1000));
+        beg1 = beg; beg2 = 361 - fin;
+        fin1 = 360 - fin; fin2 = fin;
 
         if ids1 == ids2
             ds1 = Dataset(sroot["flist2D"][ids1])
@@ -22,8 +24,10 @@ function samresort2D(
         else
             ds1 = Dataset(sroot["flist2D"][ids1])
             ds2 = Dataset(sroot["flist2D"][ids2])
-            data[:,:,1:(360-fin)]   .= ds1[spar["IDnc"]][:,:,beg:end]
-            data[:,:,(361-fin):end] .= ds2[spar["IDnc"]][:,:,1:fin]
+
+            @info "Checking Dimension Sizes" size(data[:,:,beg2:end]) size(ds2[spar["IDnc"]][:,:,1:fin2])
+            data[:,:,1:fin1]   .= ds1[spar["IDnc"]][:,:,beg1:end]
+            data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:fin2]
             close(ds1); close(ds2)
         end
 
