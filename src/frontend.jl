@@ -6,9 +6,13 @@ function samrawfolder(
 )
 
     if spar["level"] == 0
-          return joinpath(sroot["raw"],"$(spar["ID"])");
-    else; return joinpath(sroot["raw"],"$(spar["ID"])-lvl$(@sprintf("%03d",spar["level"]))")
+          fol = joinpath(sroot["raw"],"$(spar["ID"])");
+    else; fol = joinpath(sroot["raw"],"$(spar["ID"])-lvl$(@sprintf("%03d",spar["level"]))")
     end
+
+    if !isdir(fol); mkpath(fol) end
+
+    return fol
 
 end
 
