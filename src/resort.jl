@@ -79,21 +79,21 @@ function samresortsave(
 
     ds.dim["x"] = smod["size"][1];
     ds.dim["y"] = smod["size"][2];
-    if occursin("2D",mtype); ds.dim["z"] = 1; end
-    ds.dim["t"] = length(it)
+    if occursin("3D",mtype); ds.dim["z"] = 1; end
+    ds.dim["t"] = convert(Integer,it)
 
-    ncx = defVar(ds,"x",Int16,("x",),attrib = Dict(
+    ncx = defVar(ds,"x",Float32,("x",),attrib = Dict(
         "units"     => "km",
         "long_name" => "X",
     ))
 
-    ncy = defVar(ds,"y",Int16,("y",),attrib = Dict(
+    ncy = defVar(ds,"y",Float32,("y",),attrib = Dict(
         "units"     => "km",
         "long_name" => "Y",
     ))
 
-    if occursin("2D",mtype)
-        ncz = defVar(ds,"z",Int16,("z",),attrib = Dict(
+    if occursin("3D",mtype)
+        ncz = defVar(ds,"z",Float32,("z",),attrib = Dict(
             "units"     => "km",
             "long_name" => "Z",
             "level"     => spar["level"]
@@ -115,13 +115,13 @@ function samresortsave(
         "long_name"     => spar["name"],
     ))
 
-    ncx[:] = smod["x"]
-    ncy[:] = smod["y"]
-    if occursin("2D",mtype); ncz[:] = smod["z"][spar["level"]] end
+    ncx[:] = smod["x"]/1000
+    ncy[:] = smod["y"]/1000
+    if occursin("3D",mtype); ncz[:] = smod["z"][spar["level"]] / 1000 end
 
     if occursin("2D",mtype)
-          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["t2Dstep"] + stime["tbegin"]
-    else; nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["t3Dstep"] + stime["tbegin"]
+          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
+    else; nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
     end
 
     ncv[:] = data;
