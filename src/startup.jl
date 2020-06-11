@@ -81,26 +81,7 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
 
 end
 
-function retrievetime!(
-    init::AbstractDict,
-    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString},
-    t3D::Real
-)
-
-    @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
-
-    ds = Dataset(f2D[1]); init["t2D"] = ds["time"][:]; close(ds);
-
-    init["tbegin"]  = 2*init["t2D"][1] - init["t2D"][2]
-    init["tstep2D"] = (init["t2D"][end] - init["t2D"][1]) / (length(init["t2D"]) - 1)
-    init["tstep3D"] = (t3D - init["tbegin"]) / length(f3D)
-    init["t3D"] = init["tbegin"] .+ collect(1:length(f3D)) * init["tstep3D"]
-
-    return
-
-end
-
-function retrievedims(
+function retrievedims!(
     init::AbstractDict,
     f3D::Vector{<:AbstractString}
 )
@@ -108,12 +89,42 @@ function retrievedims(
     @info "$(Dates.now()) - Retrieving X,Y,Z-dimensions of data output ..."
 
     ds = Dataset(f3D[end]);
-    init["x"] = ds["x"][:]; init["y"] = ds["y"][:];
-    init["z"] = ds["z"][:]; t3D = ds["time"][1]
+    init["x"] = ds["x"][:]; init["y"] = ds["y"][:]; init["z"] = ds["z"][:];
     init["size"] = [length(init["x"]),length(init["y"]),length(init["z"])]
     close(ds);
 
-    return init,t3D
+    return
+
+end
+
+function retrievetime!(
+    init::AbstractDict,
+    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString}
+)
+
+    @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
+
+    ds = Dataset(f2D[1]);
+    t2D = ds["time"][:]; t2D1 = t2D[1]; t2D2 = t2D[2]; nt = length(t2D);
+    close(ds);
+
+    ds = Dataset(f2D[end]);
+    t2De = ds["time"]; nte = length(t2De); t2De = t2De[end]
+    close(ds);
+
+    ds = Dataset(f3D[1]);   t3D1 = ds["time"][1]; close(ds);
+    ds = Dataset(f3D[end]); t3De = ds["time"][1]; close(ds);
+
+    nt2D = nt * (length(f2D) - 1) + nte
+    nt3D = length(f3D)
+
+    init["tstep2D"] = (t2De - t2D1) / (nt2D - 1)
+    init["tstep3D"] = (t3De - t3D1) / (nt3D - 1)
+    init["tbegin"]  = t2De - init["tstep2D"] * nt2D
+    init["t2D"] = init["tbegin"] .+ collect(1:nt2D) * init["tstep2D"]
+    init["t3D"] = init["tbegin"] .+ collect(1:nt3D) * init["tstep3D"]
+
+    return
 
 end
 
@@ -171,7 +182,7 @@ function samstartup(;
 
     init,f3D,f2D = retrievename(fname,tmppath);
     sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
-    init,t3D = retrievedims(init,f3D); retrievetime!(init,f3D,f2D,t3D)
+    retrievedims!(init,f3D); retrievetime!(init,f3D,f2D)
     extractpressure!(init,f3D,sroot)
 
     return init,sroot

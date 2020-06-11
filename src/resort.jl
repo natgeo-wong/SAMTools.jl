@@ -3,12 +3,16 @@ function samresort2D(
     sroot::AbstractDict
 )
 
-    nt = length(stime["t2D"]); it = 360; nfnc = floor(nt/it) + 1; tt = 0;
-    nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
+    nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); it = 360; tt = 0;
+    nfnc = floor(nt/it) + 1;
+    data = Array{Float32,3}(undef,nx,ny,it);
 
     for inc = 1 : nfnc
 
-        if inc == nfnc; it = mod(nt,it); data = Array{Float32,3}(undef,nx,ny,it) end
+        if inc == nfnc
+            it = mod(nt,it); if it == 0; it = 360; end
+            data = Array{Float32,3}(undef,nx,ny,it)
+        end
 
         ids1 = convert(Int64,floor(((inc-1)*360+1)/1000)) + 1;
         ids2 = convert(Int64,floor((inc*360)/1000)) + 1;
@@ -24,8 +28,6 @@ function samresort2D(
         else
             ds1 = Dataset(sroot["flist2D"][ids1])
             ds2 = Dataset(sroot["flist2D"][ids2])
-
-            @info "Checking Dimension Sizes" size(data[:,:,beg2:end]) size(ds2[spar["IDnc"]][:,:,1:fin2])
             data[:,:,1:fin1]   .= ds1[spar["IDnc"]][:,:,beg1:end]
             data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:fin2]
             close(ds1); close(ds2)
