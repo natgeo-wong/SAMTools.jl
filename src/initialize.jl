@@ -194,9 +194,6 @@ function saminitialize(
     height::Real=0
 )
 
-    if occursin("3D",modID) && pressure == 0 && height == 0
-    end
-
     smod  = sammodule(modID,init);
     spar  = samparameter(parID,smod,zheight=height);
     stime = samtime(init);
