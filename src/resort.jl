@@ -39,7 +39,7 @@ function samresort2D(
             close(ds1); close(ds2)
         end
 
-        samresortsave2D(data,[inc,it],smod,spar,stime,sroot)
+        samresortsave(data,[inc,it],smod,spar,stime,sroot)
 
     end
 
