@@ -5,11 +5,7 @@ function samrawfolder(
     spar::AbstractDict, sroot::AbstractDict
 )
 
-    if spar["level"] == 0
-          fol = joinpath(sroot["raw"],"$(spar["ID"])");
-    else; fol = joinpath(sroot["raw"],"$(spar["ID"])-lvl$(@sprintf("%03d",spar["level"]))")
-    end
-
+    fol = joinpath(sroot["raw"],"$(spar["ID"])");
     if !isdir(fol); mkpath(fol) end
 
     return fol
@@ -21,12 +17,8 @@ function samrawname(
     irun::Real
 )
 
-    fol = samrawfolder(spar,sroot); lvl = spar["level"];
-
-    if spar["level"] == 0
-          fnc = "$(spar["ID"])-sfc-run$(@sprintf("%04d",irun)).nc";
-    else; fnc = "$(spar["ID"])-lvl$(@sprintf("%03d",lvl))-run$(@sprintf("%04d",irun)).nc"
-    end
+    fol = samrawfolder(spar,sroot);
+    fnc = "$(spar["ID"])-run$(@sprintf("%04d",irun)).nc";
 
     return joinpath(fol,fnc)
 

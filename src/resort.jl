@@ -39,7 +39,7 @@ function samresort2D(
             close(ds1); close(ds2)
         end
 
-        samresortsave(data,[inc,it],smod,spar,stime,sroot)
+        samresortsave2D(data,[inc,it],smod,spar,stime,sroot)
 
     end
 
@@ -52,29 +52,30 @@ function samresort3D(
 
     nt = stime["ntime"]; it = 360; nfnc = floor(nt/it) + 1; tt = 0;
     nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
-    lvl = spar["level"]; if lvl == "all"; lvl = collect(1:nz) end
 
-    for ilvl in lvl, inc = 1 : nfnc; spar["level"] = ilvl
+    for inc = 1 : nfnc
 
         if inc == nfnc
             it = mod(nt,it); if it == 0; it = 360; end
-            data = Array{Float32,3}(undef,nx,ny,it)
         end
-        
+
+        fnc = samresortsave(smod,spar,stime,sroot,[inc,it])
+        fds = Dataset(fnc,"a")
+
         for ii = 1 : it; tt = tt + 1;
             ds = Dataset(sroot["flist3D"][tt])
-            data[:,:,ii] .= ds[spar["IDnc"]][:,:,ilvl,1]
+            fds[spar["ID"]].var[:,:,:,ii] .= ds[spar["IDnc"]][:,:,:,1]
             close(ds)
         end
 
-        samresortsave(data,[inc,it],smod,spar,stime,sroot)
+        close(fds)
 
     end
 
 end
 
 function samresortsave(
-    data::Union{Array{<:Real,3},Array{<:Real,4}}, runinfo::AbstractArray,
+    data::Array{<:Real,3}, runinfo::AbstractArray,
     smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
     sroot::AbstractDict
 )
@@ -95,7 +96,6 @@ function samresortsave(
 
     ds.dim["x"] = smod["size"][1];
     ds.dim["y"] = smod["size"][2];
-    if occursin("3D",mtype); ds.dim["z"] = 1; end
     ds.dim["t"] = convert(Integer,it)
 
     ncx = defVar(ds,"x",Float32,("x",),attrib = Dict(
@@ -107,14 +107,6 @@ function samresortsave(
         "units"     => "km",
         "long_name" => "Y",
     ))
-
-    if occursin("3D",mtype)
-        ncz = defVar(ds,"z",Float32,("z",),attrib = Dict(
-            "units"     => "km",
-            "long_name" => "Z",
-            "level"     => spar["level"]
-        ))
-    end
 
     nct = defVar(ds,"t",Float64,("t",),attrib = Dict(
         "units"     => "days since 0000-00-00 00:00:00.0",
@@ -133,14 +125,68 @@ function samresortsave(
 
     ncx[:] = smod["x"]/1000
     ncy[:] = smod["y"]/1000
-    if occursin("3D",mtype); ncz[:] = smod["z"][spar["level"]] / 1000 end
+    nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
+    ncv[:] = data;
 
-    if occursin("2D",mtype)
-          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
-    else; nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
+    close(ds)
+
+end
+
+function samresortsave(
+    smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
+    sroot::AbstractDict,
+    runinfo::AbstractArray
+)
+
+    inc,it = runinfo; mtype = smod["moduletype"]
+    rfnc = samrawname(spar,sroot,irun=inc);
+    if isfile(rfnc)
+        @info "$(Dates.now()) - Stale NetCDF file $(rfnc) detected.  Overwriting ..."
+        rm(rfnc);
     end
 
-    ncv[:] = data;
+    ds = NCDataset(rfnc,"c",attrib = Dict(
+        "Conventions"  => "CF-1.6",
+        "Date Created" => "$(Dates.now())"
+    ))
+
+    scale,offset = samncoffsetscale(data);
+
+    ds.dim["x"] = smod["size"][1];
+    ds.dim["y"] = smod["size"][2];
+    ds.dim["z"] = smod["size"][3];
+    ds.dim["t"] = convert(Integer,it)
+
+    ncx = defVar(ds,"x",Float32,("x",),attrib = Dict(
+        "units"     => "km",
+        "long_name" => "X",
+    ))
+
+    ncy = defVar(ds,"y",Float32,("y",),attrib = Dict(
+        "units"     => "km",
+        "long_name" => "Y",
+    ))
+
+    ncz = defVar(ds,"z",Float32,("z",),attrib = Dict(
+        "units"     => "km",
+        "long_name" => "Z",
+    ))
+
+    nct = defVar(ds,"t",Float64,("t",),attrib = Dict(
+        "units"     => "days since 0000-00-00 00:00:00.0",
+        "long_name" => "time",
+        "calendar"  => "no_calendar",
+    ))
+
+    ncv = defVar(ds,spar["ID"],Float32,("x","y","z","t"),attrib = Dict(
+        "units"         => spar["unit"],
+        "long_name"     => spar["name"],
+    ))
+
+    ncx[:] = smod["x"]/1000
+    ncy[:] = smod["y"]/1000
+    ncz[:] = smod["z"][spar["level"]] / 1000
+    nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
 
     close(ds)
 
