@@ -112,8 +112,8 @@ function sammodule(moduleID::AbstractString,init::AbstractDict)
         @debug "$(Dates.now()) - A 2D module was selected, and therefore we will save '2D' into the parameter level Dictionary."
         smod["levels"] = ["2D"];
     else
-        @debug "$(Dates.now()) - A pressure module was selected, and therefore all available pressure levels will be saved into the parameter Dictionary."
-        smod["levels"] = init["p"]
+        @debug "$(Dates.now()) - A 3D module was selected, and therefore all available vertical levels will be saved into the parameter Dictionary."
+        smod["levels"] = init["z"]
     end
 
     smod["x"] = init["x"]; smod["y"] = init["y"]; smod["z"] = init["z"];

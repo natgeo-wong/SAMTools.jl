@@ -50,8 +50,9 @@ function samresort3D(
     sroot::AbstractDict
 )
 
-    nt = stime["ntime"]; it = 360; nfnc = floor(nt/it) + 1; tt = 0;
-    nx,ny,nz = smod["size"]; data = Array{Float32,3}(undef,nx,ny,it);
+    nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = 360;
+    nfnc = floor(nt/it) + 1; tt = 0;
+
 
     for inc = 1 : nfnc
 
@@ -62,7 +63,8 @@ function samresort3D(
         fnc = samresortsave(smod,spar,stime,sroot,[inc,it])
         fds = Dataset(fnc,"a")
 
-        for ii = 1 : it; tt = tt + 1;
+        for ii = 1 : it; tt = tt + 1
+            @info "$(Dates.now()) - Processing $(spar["name"]) data for Timestep $(tt) ..."
             ds = Dataset(sroot["flist3D"][tt])
             fds[spar["ID"]].var[:,:,:,ii] .= ds[spar["IDnc"]][:,:,:,1]
             close(ds)
@@ -150,8 +152,6 @@ function samresortsave(
         "Date Created" => "$(Dates.now())"
     ))
 
-    scale,offset = samncoffsetscale(data);
-
     ds.dim["x"] = smod["size"][1];
     ds.dim["y"] = smod["size"][2];
     ds.dim["z"] = smod["size"][3];
@@ -183,12 +183,14 @@ function samresortsave(
         "long_name"     => spar["name"],
     ))
 
-    ncx[:] = smod["x"]/1000
-    ncy[:] = smod["y"]/1000
-    ncz[:] = smod["z"][spar["level"]] / 1000
+    ncx[:] = smod["x"] / 1000
+    ncy[:] = smod["y"] / 1000
+    ncz[:] = smod["z"] / 1000
     nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
 
     close(ds)
+
+    return rfnc
 
 end
 
