@@ -142,7 +142,7 @@ function samparameter(
     if occursin("2D",mtype)
 
         if zheight != 0
-            @warn "$(Dates.now()) - You asked to analyze data at a vertical height of $(zheight) m but have chosen a surface module variable.  Setting vertical level to \"SFC\" by default"
+            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[4])) data at a vertical height of $(zheight) m, but this data is a surface module variable.  Setting vertical level to \"SFC\" by default"
         end
         return Dict(
             "ID"=>parinfo[2],"IDnc"=>parinfo[3],
@@ -155,7 +155,7 @@ function samparameter(
         if zheight != 0
 
             lvl = samvert2lvl(zheight,smod)
-            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[3])) data at the vertical height $(zheight) m.  Based on the given vertical levels, this corresponds to z-level $lvl out of $(length(smod["levels"]))."
+            @info "$(Dates.now()) - You have requested $(uppercase(parinfo[4])) data at the vertical height $(zheight) m.  Based on the given vertical levels, this corresponds to z-level $lvl out of $(length(smod["levels"]))."
 
             return Dict(
                 "ID"=>parinfo[2],"IDnc"=>parinfo[3],
@@ -165,7 +165,7 @@ function samparameter(
 
         else
 
-            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[3])) data, which is found as a 3D module but have not specified a level.  Since SAM is a CRM and is likely run with high resolution, SAMTools.jl will analyse each vertical level independently for its RESORT and ANALYSIS functionalities."
+            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[4])) data, which is found as a 3D module but have not specified a level.  Since SAM is a CRM and is likely run with high resolution, SAMTools.jl will analyse each vertical level independently for its RESORT and ANALYSIS functionalities."
 
             return Dict(
                 "ID"=>parinfo[2],"IDnc"=>parinfo[3],

@@ -52,32 +52,32 @@ function samresort3D(
 
     nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = 360;
     nfnc = floor(nt/it) + 1; tt = 0;
+    data = Array{Float32,4}(undef,nx,ny,nz,it);
 
 
     for inc = 1 : nfnc
 
         if inc == nfnc
             it = mod(nt,it); if it == 0; it = 360; end
+            data = Array{Float32,4}(undef,nx,ny,nz,it);
         end
-
-        fnc = samresortsave(smod,spar,stime,sroot,[inc,it])
-        fds = Dataset(fnc,"a")
 
         for ii = 1 : it; tt = tt + 1
             @info "$(Dates.now()) - Processing $(spar["name"]) data for Timestep $(tt) ..."
             ds = Dataset(sroot["flist3D"][tt])
-            fds[spar["ID"]].var[:,:,:,ii] .= ds[spar["IDnc"]][:,:,:,1]
+            data[:,:,:,ii] .= ds[spar["IDnc"]][:,:,:,1]
             close(ds)
         end
 
-        close(fds)
+        samresortsave(data,[inc,it],smod,spar,stime,sroot)
 
     end
 
 end
 
 function samresortsave(
-    data::Array{<:Real,3}, runinfo::AbstractArray,
+    data::Union{Array{<:Real,3},Array{<:Real,4}},
+    runinfo::AbstractArray,
     smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
     sroot::AbstractDict
 )
@@ -98,6 +98,7 @@ function samresortsave(
 
     ds.dim["x"] = smod["size"][1];
     ds.dim["y"] = smod["size"][2];
+    if occursin("3D",mtype); ds.dim["z"] = smod["size"][3]; end
     ds.dim["t"] = convert(Integer,it)
 
     ncx = defVar(ds,"x",Float32,("x",),attrib = Dict(
@@ -116,81 +117,49 @@ function samresortsave(
         "calendar"  => "no_calendar",
     ))
 
-    ncv = defVar(ds,spar["ID"],Int16,("x","y","t"),attrib = Dict(
-        "scale_factor"  => scale,
-        "add_offset"    => offset,
-        "_FillValue"    => Int16(-32767),
-        "missing_value" => Int16(-32767),
-        "units"         => spar["unit"],
-        "long_name"     => spar["name"],
-    ))
+    if occursin("2D",mtype);
+
+        ncv = defVar(ds,spar["ID"],Int16,("x","y","t"),attrib = Dict(
+            "scale_factor"  => scale,
+            "add_offset"    => offset,
+            "_FillValue"    => Int16(-32767),
+            "missing_value" => Int16(-32767),
+            "units"         => spar["unit"],
+            "long_name"     => spar["name"],
+        ))
+
+    else
+
+        ncz = defVar(ds,"z",Float32,("z",),attrib = Dict(
+            "units"     => "km",
+            "long_name" => "Z",
+        ))
+
+        ncv = defVar(ds,spar["ID"],Int16,("x","y","z","t"),attrib = Dict(
+            "scale_factor"  => scale,
+            "add_offset"    => offset,
+            "_FillValue"    => Int16(-32767),
+            "missing_value" => Int16(-32767),
+            "units"         => spar["unit"],
+            "long_name"     => spar["name"],
+        ))
+
+    end
+
+
 
     ncx[:] = smod["x"]/1000
     ncy[:] = smod["y"]/1000
-    nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
+
+    if occursin("2D",mtype)
+          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
+    else; ncz[:] = smod["z"] / 1000
+          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
+    end
+
     ncv[:] = data;
 
     close(ds)
-
-end
-
-function samresortsave(
-    smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
-    sroot::AbstractDict,
-    runinfo::AbstractArray
-)
-
-    inc,it = runinfo; mtype = smod["moduletype"]
-    rfnc = samrawname(spar,sroot,irun=inc);
-    if isfile(rfnc)
-        @info "$(Dates.now()) - Stale NetCDF file $(rfnc) detected.  Overwriting ..."
-        rm(rfnc);
-    end
-
-    ds = NCDataset(rfnc,"c",attrib = Dict(
-        "Conventions"  => "CF-1.6",
-        "Date Created" => "$(Dates.now())"
-    ))
-
-    ds.dim["x"] = smod["size"][1];
-    ds.dim["y"] = smod["size"][2];
-    ds.dim["z"] = smod["size"][3];
-    ds.dim["t"] = convert(Integer,it)
-
-    ncx = defVar(ds,"x",Float32,("x",),attrib = Dict(
-        "units"     => "km",
-        "long_name" => "X",
-    ))
-
-    ncy = defVar(ds,"y",Float32,("y",),attrib = Dict(
-        "units"     => "km",
-        "long_name" => "Y",
-    ))
-
-    ncz = defVar(ds,"z",Float32,("z",),attrib = Dict(
-        "units"     => "km",
-        "long_name" => "Z",
-    ))
-
-    nct = defVar(ds,"t",Float64,("t",),attrib = Dict(
-        "units"     => "days since 0000-00-00 00:00:00.0",
-        "long_name" => "time",
-        "calendar"  => "no_calendar",
-    ))
-
-    ncv = defVar(ds,spar["ID"],Float32,("x","y","z","t"),attrib = Dict(
-        "units"         => spar["unit"],
-        "long_name"     => spar["name"],
-    ))
-
-    ncx[:] = smod["x"] / 1000
-    ncy[:] = smod["y"] / 1000
-    ncz[:] = smod["z"] / 1000
-    nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
-
-    close(ds)
-
-    return rfnc
 
 end
 
