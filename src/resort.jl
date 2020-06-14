@@ -4,7 +4,7 @@ function samresort2D(
 )
 
     nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); it = 360; tt = 0;
-    nfnc = floor(nt/it) + 1;
+    nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,3}(undef,nx,ny,it);
 
     for inc = 1 : nfnc
@@ -50,8 +50,8 @@ function samresort3D(
     sroot::AbstractDict
 )
 
-    nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = 360;
-    nfnc = floor(nt/it) + 1; tt = 0;
+    nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = 360; tt = 0;
+    nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,4}(undef,nx,ny,nz,it);
 
 

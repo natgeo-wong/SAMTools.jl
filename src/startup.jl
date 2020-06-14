@@ -136,7 +136,8 @@ function extractpressure!(
 
     @info "$(Dates.now()) - Retrieving details on pressure coordinates over the course of the experiment ..."
 
-    nz = init["size"][3]; nf3D = length(f3D); n3Drun = floor(Int64,nf3D/360)+1;
+    nz = init["size"][3]; nf3D = length(f3D);
+    n3Drun = floor(Int64,nf3D/360); if rem(nf3D,360) != 0; n3Drun += 1 end
     p = zeros(nz,360*n3Drun)
     for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
     p = reshape(p,nz,360,n3Drun)*100; scale,offset = samncoffsetscale(p);
