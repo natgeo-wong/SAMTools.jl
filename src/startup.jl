@@ -185,17 +185,20 @@ function samstartup(;
         fname=fname
     )
 
-    if isdir(tmppath)
-        init,f3D,f2D = retrievename(fname,tmppath);
+
+    if isfile("$(sroot["raw"])/init.jld2")
+        @load "$(sroot["raw"])/init.jld2" init
+        _,f3D,f2D = retrievename(fname,tmppath);
         sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
-        retrievedims!(init,f3D); retrievetime!(init,f3D,f2D)
-        extractpressure!(init,f3D,sroot)
-        @save "$(sroot["raw"])/init.jld2" init
     else
-        if isfile("$(sroot["raw"])/init.jld2")
-            @load "$(sroot["raw"])/init.jld2" init
+        if isdir(tmppath)
+            init,f3D,f2D = retrievename(fname,tmppath);
+            sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
+            retrievedims!(init,f3D); retrievetime!(init,f3D,f2D)
+            extractpressure!(init,f3D,sroot)
+            @save "$(sroot["raw"])/init.jld2" init
         else
-            error("$(Dates.now()) - Unable to retrieve information required for initialization.  Please ensure you have specified the correct project directories, or compile the information from the temporary SAM data storage folder.")
+            error("$(Dates.now()) - Unable to retrieve information required for initialization.  Please ensure you have specified the correct project directories, or compiled the information from the temporary SAM data storage folder.")
         end
     end
 

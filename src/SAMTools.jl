@@ -14,7 +14,7 @@ using Statistics
 
 ## Exporting the following functions:
 export
-        samwelcome, samstartup, samresort, samanalysis,
+        samwelcome, samstartup, saminitialize, samresort, samanalysis,
         samparametercopy, samparameterload, samparameteradd,
         sampre2lvl, samvert2lvl
 

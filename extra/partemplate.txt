@@ -9,7 +9,7 @@ d2D.v_850,V850,Meridional Wind Component at 850 hPa,m/s
 d2D,v_200,V200,Meridional Wind Component at 200 hPa,m/s
 d2D,w_500,W500,Vertical Wind Component at 500 hPa,m/s
 d2D,lsm,LANDMASK,Land-Sea Mask,
-d2D,t_sst,SST,Skin Surface Temperature,K
+d2D,t_sst,SST,Sea Surface Temperature,K
 d2D,p_sfc,PSFC,Surface Pressure,hPa
 
 # 2D RADIATION OUTPUTS (LON,LAT)
