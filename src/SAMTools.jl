@@ -16,6 +16,7 @@ using Statistics
 export
         samwelcome, samstartup, saminitialize, samresort, samanalysis,
         samparametercopy, samparameterload, samparameteradd,
+        samrawfolder, samrawname, samrawread,
         sampre2lvl, samvert2lvl
 
 ## Including other files in the module

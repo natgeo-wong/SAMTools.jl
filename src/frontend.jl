@@ -29,8 +29,7 @@ function samrawread(
     irun::Real
 )
 
-    fnc = samrawname(spar,sroot,irun=irun)
-    ds = Dataset(joinpath(rfol,rfnc))
+    fnc = samrawname(spar,sroot,irun=irun); ds = Dataset(fnc)
     return ds,ds[spar["ID"]]
 
 end
