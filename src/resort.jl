@@ -14,8 +14,8 @@ function samresort2D(
             data = Array{Float32,3}(undef,nx,ny,it)
         end
 
-        ids1 = convert(Int64,floor(((inc-1)*360+1)/1000)) + 1;
-        ids2 = convert(Int64,floor((inc*360)/1000)) + 1;
+        ids1 = convert(Int64,floor(((inc-1)*360+1) /1000)) + 1;
+        ids2 = convert(Int64,floor(((inc-1)*360+it)/1000)) + 1;
         beg  = convert(Int64,mod((inc-1)*360+1,1000));
 
         if inc == nfnc
