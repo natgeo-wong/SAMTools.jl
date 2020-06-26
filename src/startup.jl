@@ -176,7 +176,8 @@ function samstartup(;
     experiment::AbstractString="",
     config::AbstractString,
     fname::AbstractString,
-    welcome::Bool=true
+    welcome::Bool=true,
+    loadinit=true
 )
 
     if welcome; samwelcome() end
@@ -187,7 +188,7 @@ function samstartup(;
     )
 
 
-    if isfile("$(sroot["raw"])/init.jld2")
+    if loadinit && isfile("$(sroot["raw"])/init.jld2")
         @load "$(sroot["raw"])/init.jld2" init
         _,f3D,f2D = retrievename(fname,tmppath);
         sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
