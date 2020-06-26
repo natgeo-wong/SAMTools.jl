@@ -123,6 +123,7 @@ function retrievetime!(
     init["tbegin"]  = t2De - init["tstep2D"] * nt2D
     init["t2D"] = init["tbegin"] .+ collect(1:nt2D) * init["tstep2D"]
     init["t3D"] = init["tbegin"] .+ collect(1:nt3D) * init["tstep3D"]
+    init["nt2D"] = nt;
 
     return
 
