@@ -7,3 +7,14 @@ function samncoffsetscale(data::Array{<:Real})
     return scale,offset
 
 end
+
+function findids(inc::Integer,nct::Integer,it::Integer=1)
+
+    ids = ((inc-1)*360+it)/nct; if ids != convert(Int64,floor(ids))
+          ids = convert(Int64,floor(ids)) + 1;
+    else; ids = convert(Int64,floor(ids));
+    end
+
+    return ids
+
+end

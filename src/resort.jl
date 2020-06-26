@@ -15,28 +15,33 @@ function samresort2D(
             data = Array{Float32,3}(undef,nx,ny,it)
         end
 
-        ids1 = convert(Int64,floor(((inc-1)*360+1) /nct)) + 1;
-        ids2 = convert(Int64,floor(((inc-1)*360+it)/nct)) + 1;
+        ids1 = findids(inc,nct)
+        ids2 = findids(inc,nct,it)
         beg  = convert(Int64,mod((inc-1)*360+1,nct));
 
         if inc == nfnc
               fin = convert(Int64,mod(nt,nct));
-        else; fin = convert(Int64,mod(inc*360,nct));
+        else; fin = convert(Int64,mod((inc-1)*360+it,nct));
         end
 
         if ids1 == ids2
+            if beg == 0; beg = nct; end
             if fin == 0; fin = nct; end
             ds1 = Dataset(sroot["flist2D"][ids1])
             data .= ds1[spar["IDnc"]][:,:,beg:fin]
             close(ds1)
         else
-            beg1 = beg; beg2 = mod(1-fin,360);
-            fin1 = mod(-fin,360); if fin1 == 0; fin1 = 360;  end
-            fin2 = fin;           if fin2 == 0; fin2 = nct end
+            beg1 = beg;            if beg1 == 0; beg1 = nct end
+            beg2 = mod(1-fin,360); if beg2 == 0; beg2 = it; end
+            fin1 = mod(-fin,360);  if fin1 == 0; fin1 = it; end
+            fin2 = fin;            if fin2 == 0; fin2 = nct end
             ds1  = Dataset(sroot["flist2D"][ids1])
             ds2  = Dataset(sroot["flist2D"][ids2])
             data[:,:,1:fin1]   .= ds1[spar["IDnc"]][:,:,beg1:end]
-            data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:fin2]
+            if inc != nfnc
+                  data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:fin2]
+            else; data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:end]
+            end
             close(ds1); close(ds2)
         end
 
