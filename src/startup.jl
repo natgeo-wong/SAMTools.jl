@@ -113,16 +113,23 @@ function retrievetime!(
     close(ds);
 
     ds = Dataset(f3D[1]);   t3D1 = ds["time"][1]; close(ds);
+    ds = Dataset(f3D[2]);   t3D2 = ds["time"][1]; close(ds);
     ds = Dataset(f3D[end]); t3De = ds["time"][1]; close(ds);
 
     nt2D = nt * (length(f2D) - 1) + nte
     nt3D = length(f3D)
 
-    init["tstep2D"] = (t2De - t2D1) / (nt2D - 1)
-    init["tstep3D"] = (t3De - t3D1) / (nt3D - 1)
+    init["tstep2D"] = (t2De - t2D2) / (nt2D - 2)
+    init["tstep3D"] = (t3De - t3D2) / (nt3D - 2)
+
     init["tbegin"]  = t2De - init["tstep2D"] * nt2D
-    init["t2D"] = init["tbegin"] .+ collect(1:nt2D) * init["tstep2D"]
-    init["t3D"] = init["tbegin"] .+ collect(1:nt3D) * init["tstep3D"]
+    if init["tbegin"] < 0;
+          init["t0"] = 0; init["tbegin"] = 0;
+    else; init["t0"] = 1
+    end
+
+    init["t2D"] = init["tbegin"] .+ (collect(1:nt2D) .- (1-init["t0"])) * init["tstep2D"]
+    init["t3D"] = init["tbegin"] .+ (collect(1:nt3D) .- (1-init["t0"])) * init["tstep3D"]
     init["nt2D"] = nt;
 
     return

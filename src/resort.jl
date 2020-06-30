@@ -169,9 +169,9 @@ function samresortsave(
     ncy[:] = smod["y"]/1000
 
     if occursin("2D",mtype)
-          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep2D"] .+ stime["tbegin"]
+          nct[:] = stime["t2D"][(inc-1)*360 .+ (1:it)]
     else; ncz[:] = smod["z"] / 1000
-          nct[:] = ((inc-1)*360 .+ collect(1:it)) * stime["tstep3D"] .+ stime["tbegin"]
+          nct[:] = stime["t3D"][(inc-1)*360 .+ (1:it)]
     end
 
     ncv[:] = data;
