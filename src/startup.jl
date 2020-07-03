@@ -37,11 +37,15 @@ function samroot(;
     fname::AbstractString
 )
 
-    sroot = Dict{AbstractString,Any}()
+    sroot = Dict{AbstractString,Any}(); sroot["root"] = prjpath;
 
-    sroot["tmp"] = tmppath; sroot["root"] = prjpath;
-    sroot["raw"] = joinpath(prjpath,"raw",experiment,config)
-    sroot["ana"] = joinpath(prjpath,"ana",experiment,config)
+    if tmppath == ""
+          sroot["tmp"] = joinpath(prjpath,experiment,config);
+    else; sroot["tmp"] = tmppath
+    end;
+
+    sroot["raw"] = joinpath(prjpath,experiment,config,"RAW")
+    sroot["ana"] = joinpath(prjpath,experiment,config,"ANA")
     sroot["experiment"] = experiment; sroot["configuration"] = config;
     sroot["spinup"] = ""; sroot["control"] = ""; sroot["ncname"] = fname;
 
@@ -178,7 +182,7 @@ function extractpressure!(
 end
 
 function samstartup(;
-    tmppath::AbstractString,
+    tmppath::AbstractString="",
     prjpath::AbstractString,
     experiment::AbstractString="",
     config::AbstractString,
