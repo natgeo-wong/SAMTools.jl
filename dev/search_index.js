@@ -1,3 +1,3 @@
 var documenterSearchIndex = {"docs":
-[{"location":"index.html#SAMTools-1","page":"Home","title":"SAMTools","text":"","category":"section"}]
+[{"location":"index.html#SAMTools","page":"Home","title":"SAMTools","text":"","category":"section"}]
 }
