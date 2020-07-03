@@ -39,11 +39,7 @@ function samroot(;
 
     sroot = Dict{AbstractString,Any}(); sroot["root"] = prjpath;
 
-    if tmppath == ""
-          sroot["tmp"] = joinpath(prjpath,experiment,config);
-    else; sroot["tmp"] = tmppath
-    end;
-
+    sroot["tmp"] = tmppath
     sroot["raw"] = joinpath(prjpath,experiment,config,"RAW")
     sroot["ana"] = joinpath(prjpath,experiment,config,"ANA")
     sroot["experiment"] = experiment; sroot["configuration"] = config;
@@ -192,6 +188,8 @@ function samstartup(;
 )
 
     if welcome; samwelcome() end
+    if tmppath == ""; tmppath = joinpath(prjpath,experiment,config); end
+
     sroot = samroot(;
         tmppath=tmppath,prjpath=prjpath,
         experiment=experiment,config=config,
