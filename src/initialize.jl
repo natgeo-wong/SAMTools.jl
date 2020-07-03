@@ -165,7 +165,7 @@ function samparameter(
 
         else
 
-            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[4])) data, which is found as a 3D module but have not specified a level.  Since SAM is a CRM and is likely run with high resolution, SAMTools.jl will analyse each vertical level independently for its RESORT and ANALYSIS functionalities."
+            @warn "$(Dates.now()) - You asked to analyze $(uppercase(parinfo[4])) data, which is found as a 3D module but have not specified a level.  Since SAM is a CRM and is likely run with high resolution, this may cause OUT-OF-MEMORY errors.  Please ensure that enough memory has been allocated."
 
             return Dict(
                 "ID"=>parinfo[2],"IDnc"=>parinfo[3],

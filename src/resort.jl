@@ -69,7 +69,6 @@ function samresort3D(
         end
 
         for ii = 1 : it; tt = tt + 1
-            @info "$(Dates.now()) - Processing $(spar["name"]) data for Timestep $(tt) ..."
             ds = Dataset(sroot["flist3D"][tt])
             data[:,:,:,ii] .= ds[spar["IDnc"]][:,:,:,1]
             close(ds)
