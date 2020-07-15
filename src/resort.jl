@@ -1,4 +1,4 @@
-function samresort2D(
+function samresort2Dall(
     smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
     sroot::AbstractDict
 )
@@ -43,6 +43,35 @@ function samresort2D(
             else; data[:,:,beg2:end] .= ds2[spar["IDnc"]][:,:,1:end]
             end
             close(ds1); close(ds2)
+        end
+
+        samresortsave(data,[inc,it],smod,spar,stime,sroot)
+
+    end
+
+end
+
+function samresort2Dsep(
+    smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
+    sroot::AbstractDict
+)
+
+    nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); it = 360; tt = 0;
+    nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
+    data = Array{Float32,3}(undef,nx,ny,it);
+
+
+    for inc = 1 : nfnc
+
+        if inc == nfnc
+            it = mod(nt,it); if it == 0; it = 360; end
+            data = Array{Float32,3}(undef,nx,ny,it);
+        end
+
+        for ii = 1 : it; tt = tt + 1
+            ds = Dataset(sroot["flist2D"][tt])
+            data[:,:,ii] .= ds[spar["IDnc"]][:,:,1]
+            close(ds)
         end
 
         samresortsave(data,[inc,it],smod,spar,stime,sroot)
@@ -185,7 +214,10 @@ function samresort(
 )
 
     if occursin("2D",smod["moduletype"]);
-          samresort2D(smod,spar,stime,sroot)
+          if smod["2Dsep"]
+                samresort2Dsep(smod,spar,stime,sroot)
+          else; samresort2Dall(smod,spar,stime,sroot)
+          end
     else; samresort3D(smod,spar,stime,sroot)
     end
 
