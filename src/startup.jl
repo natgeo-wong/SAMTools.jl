@@ -105,11 +105,11 @@ function retrievetime!(
     @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
 
     ds = Dataset(f2D[1]);
-    t2D = ds["time"][:]; t2D1 = t2D[1]; t2D2 = t2D[2]; nt = length(t2D);
+    t2D = ds["time"]; t2D1 = t2D[1]; t2D2 = t2D[2]; nt = ds.dim["time"];
     close(ds);
 
     ds = Dataset(f2D[end]);
-    t2De = ds["time"]; nte = length(t2De); t2De = t2De[end]
+    t2De = ds["time"]; t2De = t2De[end]; nte = ds.dim["time"];
     close(ds);
 
     ds = Dataset(f3D[1]);   t3D1 = ds["time"][1]; close(ds);
