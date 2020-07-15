@@ -117,7 +117,7 @@ function sammodule(moduleID::AbstractString,init::AbstractDict)
     end
 
     smod["x"] = init["x"]; smod["y"] = init["y"]; smod["z"] = init["z"];
-    smod["size"] = init["size"];
+    smod["size"] = init["size"]; smod["2Dsep"] = init["2Dsep"]
 
     return smod
 

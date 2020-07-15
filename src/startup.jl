@@ -132,6 +132,8 @@ function retrievetime!(
     init["t3D"] = init["tbegin"] .+ (collect(1:nt3D) .- (1-init["t0"])) * init["tstep3D"]
     init["nt2D"] = nt;
 
+    if nt == 1; init["2Dsep"] = true; else; init["2Dsep"] = false end
+
     return
 
 end
