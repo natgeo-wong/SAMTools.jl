@@ -4,26 +4,26 @@ function samresort2Dall(
 )
 
     nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); nct = stime["nt2D"];
-    it = 1000; tt = 0;
+    it = stime["it"]; tt = 0;
     nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,3}(undef,nx,ny,it);
 
     for inc = 1 : nfnc
 
-        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... CYCLE $(inc)"
+        @info "$(Dates.now()) - Resorting $(uppercase(spar["name"])) data into chunks of $(stime["it"]) timesteps ... CYCLE $(inc)"
 
         if inc == nfnc
-            it = mod(nt,it); if it == 0; it = 1000; end
+            it = mod(nt,it); if it == 0; it = stime["it"]; end
             data = Array{Float32,3}(undef,nx,ny,it)
         end
 
         ids1 = findids(inc,nct)
         ids2 = findids(inc,nct,it)
-        beg  = convert(Int64,mod((inc-1)*1000+1,nct));
+        beg  = convert(Int64,mod((inc-1)*stime["it"]+1,nct));
 
         if inc == nfnc
               fin = convert(Int64,mod(nt,nct));
-        else; fin = convert(Int64,mod((inc-1)*1000+it,nct));
+        else; fin = convert(Int64,mod((inc-1)*stime["it"]+it,nct));
         end
 
         if ids1 == ids2
@@ -33,10 +33,10 @@ function samresort2Dall(
             data .= ds1[spar["IDnc"]][:,:,beg:fin]
             close(ds1)
         else
-            beg1 = beg;            if beg1 == 0; beg1 = nct end
-            beg2 = mod(1-fin,1000); if beg2 == 0; beg2 = it; end
-            fin1 = mod(-fin,1000);  if fin1 == 0; fin1 = it; end
-            fin2 = fin;            if fin2 == 0; fin2 = nct end
+            beg1 = beg;                    if beg1 == 0; beg1 = nct end
+            beg2 = mod(1-fin,stime["it"]); if beg2 == 0; beg2 = it; end
+            fin1 = mod(-fin,stime["it"]);  if fin1 == 0; fin1 = it; end
+            fin2 = fin;                    if fin2 == 0; fin2 = nct end
             ds1  = Dataset(sroot["flist2D"][ids1])
             ds2  = Dataset(sroot["flist2D"][ids2])
             data[:,:,1:fin1]   .= ds1[spar["IDnc"]][:,:,beg1:end]
@@ -58,17 +58,17 @@ function samresort2Dsep(
     sroot::AbstractDict
 )
 
-    nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); it = 1000; tt = 0;
+    nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); it = stime["it"]; tt = 0;
     nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,3}(undef,nx,ny,it);
 
 
     for inc = 1 : nfnc
 
-        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... FILE $(inc)"
+        @info "$(Dates.now()) - Resorting $(uppercase(spar["name"])) data into chunks of $(stime["it"]) timesteps ... FILE $(inc)"
 
         if inc == nfnc
-            it = mod(nt,it); if it == 0; it = 1000; end
+            it = mod(nt,it); if it == 0; it = stime["it"]; end
             data = Array{Float32,3}(undef,nx,ny,it);
         end
 
@@ -89,16 +89,16 @@ function samresort3D(
     sroot::AbstractDict
 )
 
-    nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = 1000; tt = 0;
+    nx,ny,nz = smod["size"]; nt = length(stime["t3D"]); it = stime["it"]; tt = 0;
     nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,4}(undef,nx,ny,nz,it);
 
     for inc = 1 : nfnc
 
-        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... CYCLE $(inc)"
+        @info "$(Dates.now()) - Resorting $(uppercase(spar["name"])) data into chunks of $(stime["it"]) timesteps ... CYCLE $(inc)"
 
         if inc == nfnc
-            it = mod(nt,it); if it == 0; it = 1000; end
+            it = mod(nt,it); if it == 0; it = stime["it"]; end
             data = Array{Float32,4}(undef,nx,ny,nz,it);
         end
 
@@ -184,9 +184,9 @@ function samresortsave(
     ncy[:] = smod["y"]/1000
 
     if occursin("2D",mtype)
-          nct[:] = stime["t2D"][(inc-1)*1000 .+ (1:it)]
+          nct[:] = stime["t2D"][(inc-1)*stime["it"] .+ (1:it)]
     else; ncz[:] = smod["z"] / 1000
-          nct[:] = stime["t3D"][(inc-1)*1000 .+ (1:it)]
+          nct[:] = stime["t3D"][(inc-1)*stime["it"] .+ (1:it)]
     end
 
     ncv[:] = data;

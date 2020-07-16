@@ -99,7 +99,8 @@ end
 
 function retrievetime!(
     init::AbstractDict,
-    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString}
+    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString},
+    it::Integer
 )
 
     @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
@@ -135,7 +136,7 @@ function retrievetime!(
 
     init["t2D"] = init["tbegin"] .+ (collect(1:nt2D) .- (1-init["t0"])) * init["tstep2D"]
     init["t3D"] = init["tbegin"] .+ (collect(1:nt3D) .- (1-init["t0"])) * init["tstep3D"]
-    init["nt2D"] = nt;
+    init["nt2D"] = nt; init["it"] = it;
 
     if nt == 1; init["2Dsep"] = true; else; init["2Dsep"] = false end
 
@@ -152,9 +153,9 @@ function extractpressure!(
     @info "$(Dates.now()) - Retrieving details on pressure coordinates over the course of the experiment ..."
 
     nz = init["size"][3]; nf3D = length(f3D);
-    n3Drun = floor(Int64,nf3D/1000); if rem(nf3D,1000) != 0; n3Drun += 1 end
-    p = zeros(nz,1000*n3Drun)
-    for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
+    n3Drun = floor(Int64,nf3D/init["it"]); if rem(nf3D,init["it"]) != 0; n3Drun += 1 end
+    p = zeros(nz,init["it"]*n3Drun)
+    for inc in 1 : init["it"]; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
     p = reshape(p,nz,1000,n3Drun)*100; scale,offset = samncoffsetscale(p);
 
     if !isdir(sroot["raw"]); mkpath(sroot["raw"]); end
@@ -163,7 +164,7 @@ function extractpressure!(
     @info "$(Dates.now()) - Saving pressure coordinate information ..."
 
     fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset(fp,"c")
-    ds.dim["z"] = nz; ds.dim["t"] = 1000; ds.dim["nruns"] = n3Drun
+    ds.dim["z"] = nz; ds.dim["t"] = init["it"]; ds.dim["nruns"] = n3Drun
     ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
         "long_name"     => "Pressure",
@@ -191,7 +192,8 @@ function samstartup(;
     config::AbstractString,
     fname::AbstractString,
     welcome::Bool=true,
-    loadinit=true
+    loadinit=true,
+    it::Integer=1000
 )
 
     if welcome; samwelcome() end
@@ -212,7 +214,7 @@ function samstartup(;
         if isdir(tmppath)
             init,f3D,f2D = retrievename(fname,tmppath);
             sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
-            retrievedims!(init,f3D); retrievetime!(init,f3D,f2D)
+            retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,it)
             extractpressure!(init,f3D,sroot)
             @save "$(sroot["raw"])/init.jld2" init
         else
