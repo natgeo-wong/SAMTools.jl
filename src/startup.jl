@@ -152,10 +152,10 @@ function extractpressure!(
     @info "$(Dates.now()) - Retrieving details on pressure coordinates over the course of the experiment ..."
 
     nz = init["size"][3]; nf3D = length(f3D);
-    n3Drun = floor(Int64,nf3D/360); if rem(nf3D,360) != 0; n3Drun += 1 end
-    p = zeros(nz,360*n3Drun)
+    n3Drun = floor(Int64,nf3D/1000); if rem(nf3D,1000) != 0; n3Drun += 1 end
+    p = zeros(nz,1000*n3Drun)
     for inc in 1 : nf3D; ds = Dataset(f3D[inc]); p[:,inc] = ds["p"][:]; close(ds) end
-    p = reshape(p,nz,360,n3Drun)*100; scale,offset = samncoffsetscale(p);
+    p = reshape(p,nz,1000,n3Drun)*100; scale,offset = samncoffsetscale(p);
 
     if !isdir(sroot["raw"]); mkpath(sroot["raw"]); end
     if !isdir(sroot["ana"]); mkpath(sroot["ana"]); end
@@ -163,7 +163,7 @@ function extractpressure!(
     @info "$(Dates.now()) - Saving pressure coordinate information ..."
 
     fp = joinpath(sroot["raw"],"p.nc"); ds = Dataset(fp,"c")
-    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
+    ds.dim["z"] = nz; ds.dim["t"] = 1000; ds.dim["nruns"] = n3Drun
     ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
         "long_name"     => "Pressure",
@@ -172,7 +172,7 @@ function extractpressure!(
     close(ds)
 
     fp = joinpath(sroot["ana"],"p.nc"); ds = Dataset(fp,"c")
-    ds.dim["z"] = nz; ds.dim["t"] = 360; ds.dim["nruns"] = n3Drun
+    ds.dim["z"] = nz; ds.dim["t"] = 1000; ds.dim["nruns"] = n3Drun
     ncp = defVar(ds,"p",Float32,("z","t","nruns"),attrib = Dict(
         "units"         => "Pa",
         "long_name"     => "Pressure",
