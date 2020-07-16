@@ -153,25 +153,10 @@ function samresortsave(
 
     if occursin("2D",mtype);
 
-        if it != 1
-
-            ncv = defVar(ds,spar["ID"],Int16,("x","y","t"),attrib = Dict(
-                "scale_factor"  => scale,
-                "add_offset"    => offset,
-                "_FillValue"    => Int16(-32767),
-                "missing_value" => Int16(-32767),
-                "units"         => spar["unit"],
-                "long_name"     => spar["name"],
-            ))
-
-        else
-
-            ncv = defVar(ds,spar["ID"],Float32,("x","y","t"),attrib = Dict(
-                "units"         => spar["unit"],
-                "long_name"     => spar["name"],
-            ))
-
-        end
+        ncv = defVar(ds,spar["ID"],Float32,("x","y","t"),attrib = Dict(
+            "units"         => spar["unit"],
+            "long_name"     => spar["name"],
+        ))
 
     else
 
@@ -180,11 +165,7 @@ function samresortsave(
             "long_name" => "Z",
         ))
 
-        ncv = defVar(ds,spar["ID"],Int16,("x","y","z","t"),attrib = Dict(
-            "scale_factor"  => scale,
-            "add_offset"    => offset,
-            "_FillValue"    => Int16(-32767),
-            "missing_value" => Int16(-32767),
+        ncv = defVar(ds,spar["ID"],Float32,("x","y","z","t"),attrib = Dict(
             "units"         => spar["unit"],
             "long_name"     => spar["name"],
         ))
