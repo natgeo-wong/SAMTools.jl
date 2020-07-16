@@ -10,6 +10,8 @@ function samresort2Dall(
 
     for inc = 1 : nfnc
 
+        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... CYCLE $(inc)"
+
         if inc == nfnc
             it = mod(nt,it); if it == 0; it = 360; end
             data = Array{Float32,3}(undef,nx,ny,it)
@@ -63,6 +65,8 @@ function samresort2Dsep(
 
     for inc = 1 : nfnc
 
+        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... FILE $(inc)"
+
         if inc == nfnc
             it = mod(nt,it); if it == 0; it = 360; end
             data = Array{Float32,3}(undef,nx,ny,it);
@@ -89,8 +93,9 @@ function samresort3D(
     nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,4}(undef,nx,ny,nz,it);
 
-
     for inc = 1 : nfnc
+
+        @info "$(Dates.now()) - Resorting $(spar["name"]) data into chunks of 360 timesteps ... CYCLE $(inc)"
 
         if inc == nfnc
             it = mod(nt,it); if it == 0; it = 360; end
@@ -117,6 +122,9 @@ function samresortsave(
 )
 
     inc,it = runinfo; mtype = smod["moduletype"]
+
+    @info "$(Dates.now()) - Saving $(uppercase(spar["name"])) data for CYCLE $(inc) ..."
+
     rfnc = samrawname(spar,sroot,irun=inc);
     if isfile(rfnc)
         @info "$(Dates.now()) - Stale NetCDF file $(rfnc) detected.  Overwriting ..."
@@ -172,8 +180,6 @@ function samresortsave(
 
     end
 
-
-
     ncx[:] = smod["x"]/1000
     ncy[:] = smod["y"]/1000
 
@@ -186,6 +192,8 @@ function samresortsave(
     ncv[:] = data;
 
     close(ds)
+
+    @info "$(Dates.now()) - $(uppercase(spar["name"])) data for CYCLE $(inc) has been saved into the file $rfnc ..."
 
 end
 
