@@ -4,8 +4,8 @@ This file initializes the SAMTools module by defining the directories relevant t
 
 function samspin(sroot::AbstractDict)
 
-    efol = joinpath(sroot["root"],"raw",sroot["experiment"]);
-    sfol = joinpath(sroot["root"],"raw",sroot["experiment"],"spinup");
+    efol = joinpath(sroot["root"],sroot["experiment"]);
+    sfol = joinpath(sroot["root"],sroot["experiment"],"spinup");
     if isdir(sfol)
         @info "$(Dates.now()) - A spinup configuration folder has been identified in $(efol)."
         return true;
