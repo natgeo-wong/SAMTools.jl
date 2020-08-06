@@ -74,10 +74,16 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
     init = Dict{AbstractString,Any}()
     f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
     f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
+    fst  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_STAT"));
+
+    if occursin("001.",f2D[1]); f2D = f2D[2:end] end
+    if occursin("001.",f3D[1]); f3D = f3D[2:end] end
+
     nf2D = length(f2D); init["n2Dtime"] = nf2D
     nf3D = length(f3D); init["n3Dtime"] = nf3D
+    nfst = length(fst); init["nstatnc"] = nf3D
 
-    return init,f3D,f2D
+    return init,f3D,f2D,fst
 
 end
 
@@ -99,17 +105,25 @@ end
 
 function retrievetime!(
     init::AbstractDict,
-    f3D::Vector{<:AbstractString}, f2D::Vector{<:AbstractString},
+    f3D::Vector{<:AbstractString},
+    f2D::Vector{<:AbstractString},
+    fst::Vector{<:AbstractString},
     it::Integer
 )
 
     @info "$(Dates.now()) - Retrieving details on time start, step and end for 2D and 3D outputs ..."
 
+    ds = Dataset(fst[1]);   tst1 = ds["time"][1];   nt1 = ds.dim["time"]; close(ds);
+    ds = Dataset(fst[end]); tste = ds["time"][end]; nte = ds.dim["time"]; close(ds);
+    ntst = nt1 * (length(fst) - 1) + nte
+
+    init["day0"] = tste - (nte-nt1)/(ntst-1) * ntst
+    init["dayh"] = mod(init["day0"],1)
+
     ds = Dataset(f2D[1]);
     t2D = ds["time"]; nt = ds.dim["time"]; t2D1 = t2D[1];
     if nt == 1
-          ds2  = Dataset(f2D[2]);
-          t2D2 = ds2["time"][1]; close(ds2);
+          ds2 = Dataset(f2D[2]); t2D2 = ds2["time"][1]; close(ds2);
     else; t2D2 = t2D[2]
     end
     close(ds);
@@ -119,23 +133,30 @@ function retrievetime!(
     close(ds);
 
     ds = Dataset(f3D[1]);   t3D1 = ds["time"][1]; close(ds);
-    ds = Dataset(f3D[2]);   t3D2 = ds["time"][1]; close(ds);
     ds = Dataset(f3D[end]); t3De = ds["time"][1]; close(ds);
+
+    sep = (t2D2 + init["day0"]) - 2 * t2D1
+
+    # if nt = 1, then f2D by extension does not include the 00000001.bin_1.nc file and
+    # therefore t2D2 - t2D1 should be equal to t2D1 - tbegin, so sep = 0 and no change to
+    # nt2D
+    #
+    # if nt > 1, then if sep < 0, then must subtract nt2D by 1.  But if sep = 0, then
+    # everything remains as is.  If sep > 0, then we must consider another case ...
 
     nt2D = nt * (length(f2D) - 1) + nte
     nt3D = length(f3D)
 
-    init["tstep2D"] = (t2De - t2D2) / (nt2D - 2)
-    init["tstep3D"] = (t3De - t3D2) / (nt3D - 2)
-
-    init["tbegin"]  = t2De - init["tstep2D"] * nt2D
-    if init["tbegin"] < 0;
-          init["t0"] = 0; init["tbegin"] = 0;
-    else; init["t0"] = 1
+    if sep < 0; t2D1 = t2D2; nt2D = nt2D - 1; init["is01t"] = 1
+    else; init["is01t"] = 0
     end
 
-    init["t2D"] = init["tbegin"] .+ (collect(1:nt2D) .- (1-init["t0"])) * init["tstep2D"]
-    init["t3D"] = init["tbegin"] .+ (collect(1:nt3D) .- (1-init["t0"])) * init["tstep3D"]
+    init["tstep2D"] = (t2De - t2D1) / (nt2D - 1)
+    init["tstep3D"] = (t3De - t3D1) / (nt3D - 1)
+    init["tstepst"] = (nte  - nt1)  / (ntst - 1)
+
+    init["t2D"] = t2D1 .+ collect(0:(nt2D-1)) * init["tstep2D"]
+    init["t3D"] = t3D1 .+ collect(0:(nt3D-1)) * init["tstep3D"]
     init["nt2D"] = nt; init["it"] = it;
 
     if nt == 1; init["2Dsep"] = true; else; init["2Dsep"] = false end
@@ -208,13 +229,13 @@ function samstartup(;
 
     if loadinit && isfile("$(sroot["raw"])/init.jld2")
         @load "$(sroot["raw"])/init.jld2" init
-        _,f3D,f2D = retrievename(fname,tmppath);
-        sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
+        _,f3D,f2D,fst = retrievename(fname,tmppath);
+        sroot["flist3D"] = f3D; sroot["flist2D"] = f2D; sroot["flistst"] = fst
     else
         if isdir(tmppath)
-            init,f3D,f2D = retrievename(fname,tmppath);
-            sroot["flist3D"] = f3D; sroot["flist2D"] = f2D;
-            retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,it)
+            init,f3D,f2D,fst = retrievename(fname,tmppath);
+            sroot["flist3D"] = f3D; sroot["flist2D"] = f2D; sroot["flistst"] = fst
+            retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,fst,it)
             extractpressure!(init,f3D,sroot)
             @save "$(sroot["raw"])/init.jld2" init
         else

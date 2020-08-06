@@ -35,7 +35,6 @@ m2D,prcp,Prec,Surface Precipitation Rate,mm/day
 m2D,cld_frq,CLD,Cloud Frequency,%
 m2D.cld_top_z,ZC,Cloud Top Height,km
 m2D,cld_top_t,TB,Cloud Top Temperature,K
-m2D,cld_cov,Cloud Cover,
 
 # 3D OUTPUTS (LON,LAT,Z)
 s3D,u_air,U,Zonal Wind Component,m/s

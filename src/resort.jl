@@ -4,7 +4,7 @@ function samresort2Dall(
 )
 
     nx,ny,nz = smod["size"]; nt = length(stime["t2D"]); nct = stime["nt2D"];
-    it = stime["it"]; tt = 0;
+    it = stime["it"]
     nfnc = floor(Int64,nt/it); if rem(nt,it) != 0; nfnc += 1 end
     data = Array{Float32,3}(undef,nx,ny,it);
 
@@ -19,11 +19,11 @@ function samresort2Dall(
 
         ids1 = findids(inc,nct)
         ids2 = findids(inc,nct,it)
-        beg  = convert(Int64,mod((inc-1)*stime["it"]+1,nct));
+        beg  = convert(Int64,mod((inc-1)*stime["it"]+init["is01t"]+1,nct));
 
         if inc == nfnc
               fin = convert(Int64,mod(nt,nct));
-        else; fin = convert(Int64,mod((inc-1)*stime["it"]+it,nct));
+        else; fin = convert(Int64,mod((inc-1)*stime["it"]+init["is01t"]+it,nct));
         end
 
         if ids1 == ids2
