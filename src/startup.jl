@@ -76,8 +76,8 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
     f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
     fst  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_STAT"));
 
-    if occursin("001.",f2D[1]); f2D = f2D[2:end] end
-    if occursin("001.",f3D[1]); f3D = f3D[2:end] end
+    if f2D != []; if occursin("001.",f2D[1]); f2D = f2D[2:end] end; end
+    if f3D != []; if occursin("001.",f3D[1]); f3D = f3D[2:end] end; end
 
     nf2D = length(f2D); init["n2Dtime"] = nf2D
     nf3D = length(f3D); init["n3Dtime"] = nf3D
