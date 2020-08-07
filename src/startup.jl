@@ -117,7 +117,7 @@ function retrievetime!(
     ds = Dataset(fst[end]); tste = ds["time"][end]; nte = ds.dim["time"]; close(ds);
     ntst = nt1 * (length(fst) - 1) + nte
 
-    init["day0"] = tste - (nte-nt1)/(ntst-1) * ntst
+    init["day0"] = tste - (tste-tst1)/(ntst-1) * ntst
     init["dayh"] = mod(init["day0"],1)
 
     ds = Dataset(f2D[1]);
@@ -153,7 +153,7 @@ function retrievetime!(
 
     init["tstep2D"] = (t2De - t2D1) / (nt2D - 1)
     init["tstep3D"] = (t3De - t3D1) / (nt3D - 1)
-    init["tstepst"] = (nte  - nt1)  / (ntst - 1)
+    init["tstepst"] = (tste - tst1) / (ntst - 1)
 
     init["t2D"] = t2D1 .+ collect(0:(nt2D-1)) * init["tstep2D"]
     init["t3D"] = t3D1 .+ collect(0:(nt3D-1)) * init["tstep3D"]
