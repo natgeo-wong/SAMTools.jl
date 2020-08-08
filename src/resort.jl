@@ -136,7 +136,9 @@ function samresortsave(
         "Date Created" => "$(Dates.now())"
     ))
 
-    scale,offset = samncoffsetscale(data);
+    if occursin("3D",mtype);
+        scale,offset = samncoffsetscale(data);
+    end
 
     ds.dim["x"] = smod["size"][1];
     ds.dim["y"] = smod["size"][2];
@@ -173,9 +175,13 @@ function samresortsave(
             "long_name" => "Z",
         ))
 
-        ncv = defVar(ds,spar["ID"],Float32,("x","y","z","t"),attrib = Dict(
+        ncv = defVar(ds,spar["ID"],Int16,("x","y","z","t"),attrib = Dict(
             "units"         => spar["unit"],
             "long_name"     => spar["name"],
+            "scale_factor"  => scale,
+            "add_offset"    => offset,
+            "_FillValue"    => Int16(-32767),
+            "missing_value" => Int16(-32767),
         ))
 
     end
