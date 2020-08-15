@@ -117,7 +117,11 @@ function retrievetime!(
     ds = Dataset(fst[end]); tste = ds["time"][end]; nte = ds.dim["time"]; close(ds);
     ntst = nt1 * (length(fst) - 1) + nte
 
-    init["day0"] = tste - (tste-tst1)/(ntst-1) * ntst
+    # Note, for OUT_STAT, the times are the AVERAGE of the bin period.  So STAT for between
+    # period 80.5 and 80.6 would have a timestep of 80.55, and the next time value is
+    # 80.65, and so on ...
+
+    init["day0"] = tste - (tste-tst1)/(ntst-1) * (ntst - 0.5)
     init["dayh"] = mod(init["day0"],1)
 
     ds = Dataset(f2D[1]);
