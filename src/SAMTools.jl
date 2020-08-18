@@ -5,6 +5,7 @@ using CFTime
 using Crayons, Crayons.Box
 using Dates
 using DelimitedFiles
+using Dierckx
 using Glob
 using JLD2
 using NCDatasets
@@ -14,7 +15,7 @@ using Statistics
 
 ## Exporting the following functions:
 export
-        samwelcome, samstartup, saminitialize, samresort, samanalysis,
+        samwelcome, samstartup, saminitialize, samresort, samanalysis, samroot, samsnd,
         samparametercopy, samparameterload, samparameteradd,
         samrawfolder, samrawname, samrawread,
         sampre2lvl, samvert2lvl
@@ -24,6 +25,8 @@ include("startup.jl")
 include("initialize.jl")
 include("resort.jl")
 include("analysis.jl")
+
+include("snd.jl")
 
 include("frontend.jl")
 include("backend.jl")

@@ -13,7 +13,7 @@ are to be extracted from.  Functionalities include:
 
 function samparametercopy(;overwrite::Bool=false)
 
-    jfol = joinpath(DEPOT_PATH[1],"files/samTools/"); mkpath(jfol);
+    jfol = joinpath(DEPOT_PATH[1],"files/SAMTools/"); mkpath(jfol);
     ftem = joinpath(@__DIR__,"../extra/partemplate.txt")
     fpar = joinpath(jfol,"samparameters.txt")
 

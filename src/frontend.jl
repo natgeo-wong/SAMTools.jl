@@ -14,7 +14,7 @@ end
 
 function samrawname(
     spar::AbstractDict, sroot::AbstractDict;
-    irun::Real
+    irun::Integer
 )
 
     fol = samrawfolder(spar,sroot);
@@ -26,10 +26,22 @@ end
 
 function samrawread(
     spar::AbstractDict, sroot::AbstractDict;
-    irun::Real
+    irun::Integer
 )
 
     fnc = samrawname(spar,sroot,irun=irun); ds = Dataset(fnc)
     return ds,ds[spar["ID"]]
+
+end
+
+function samstatread(
+    statvar::AbstractString, sroot::AbstractDict;
+    irun::Integer=1
+)
+
+    tnc = sroot["flistst"][irun]
+    fnc = joinpath(sroot["stat"],split(tnc,"/")[end]);
+
+    return ds,ds[statvar]
 
 end

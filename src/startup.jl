@@ -39,9 +39,10 @@ function samroot(;
 
     sroot = Dict{AbstractString,Any}(); sroot["root"] = prjpath;
 
-    sroot["tmp"] = tmppath
-    sroot["raw"] = joinpath(prjpath,experiment,config,"RAW")
-    sroot["ana"] = joinpath(prjpath,experiment,config,"ANA")
+    sroot["tmp"]  = tmppath
+    sroot["raw"]  = joinpath(prjpath,experiment,config,"RAW")
+    sroot["ana"]  = joinpath(prjpath,experiment,config,"ANA")
+    sroot["stat"] = joinpath(prjpath,experiment,config,"OUT_STAT")
     sroot["experiment"] = experiment; sroot["configuration"] = config;
     sroot["spinup"] = ""; sroot["control"] = ""; sroot["ncname"] = fname;
 
@@ -50,6 +51,7 @@ function samroot(;
       $(BOLD("Project Directory:")) $prjpath
       $(BOLD("Raw Data Directory:")) $(sroot["raw"])
       $(BOLD("Analysis Directory:")) $(sroot["ana"])
+      $(BOLD("Statistical Output:")) $(sroot["stat"])
       $(BOLD("File Prefix:")) $fname
       $(BOLD("Experiment | Configuration:")) $experiment | $config
     """
@@ -72,16 +74,16 @@ function retrievename(fname::AbstractString,tmppath::AbstractString)
     @info "$(Dates.now()) - Retrieving list of 2D and 3D NetCDF output files ..."
 
     init = Dict{AbstractString,Any}()
-    f3D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
-    f2D  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
-    fst  = glob("$(fname)*.nc",joinpath(tmppath,"OUT_STAT"));
+    f3D  = glob("*$(fname)*.nc",joinpath(tmppath,"OUT_3D"));
+    f2D  = glob("*$(fname)*.nc",joinpath(tmppath,"OUT_2D"));
+    fst  = glob("*$(fname)*.nc",joinpath(tmppath,"OUT_STAT"));
 
     if f2D != []; if occursin("001.",f2D[1]); f2D = f2D[2:end] end; end
     if f3D != []; if occursin("001.",f3D[1]); f3D = f3D[2:end] end; end
 
     nf2D = length(f2D); init["n2Dtime"] = nf2D
     nf3D = length(f3D); init["n3Dtime"] = nf3D
-    nfst = length(fst); init["nstatnc"] = nf3D
+    nfst = length(fst); init["nstatnc"] = nfst
 
     return init,f3D,f2D,fst
 
