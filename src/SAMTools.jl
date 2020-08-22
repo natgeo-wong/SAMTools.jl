@@ -18,17 +18,18 @@ export
         samwelcome, samstartup, saminitialize, samresort, samanalysis, samroot, samsnd,
         samparametercopy, samparameterload, samparameteradd,
         samrawfolder, samrawname, samrawread,
-        sampre2lvl, samvert2lvl
+        sampre2lvl, samvert2lvl,
+        lsfinit, lsfprint
 
 ## Including other files in the module
 include("startup.jl")
 include("initialize.jl")
 include("resort.jl")
-include("analysis.jl")
-
-include("snd.jl")
 
 include("frontend.jl")
 include("backend.jl")
+
+include("casesetup/snd.jl")
+include("casesetup/lsf.jl")
 
 end
