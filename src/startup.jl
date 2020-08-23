@@ -42,7 +42,7 @@ function samroot(;
     sroot["tmp"]  = tmppath
     sroot["raw"]  = joinpath(prjpath,experiment,config,"RAW")
     sroot["ana"]  = joinpath(prjpath,experiment,config,"ANA")
-    sroot["stat"] = joinpath(prjpath,experiment,config,"OUT_STAT")
+    sroot["stat"] = joinpath(tmppath,"OUT_STAT")
     sroot["experiment"] = experiment; sroot["configuration"] = config;
     sroot["spinup"] = ""; sroot["control"] = ""; sroot["ncname"] = fname;
 
