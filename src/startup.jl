@@ -163,6 +163,7 @@ function retrievetime!(
 
     init["t2D"] = t2D1 .+ collect(0:(nt2D-1)) * init["tstep2D"]
     init["t3D"] = t3D1 .+ collect(0:(nt3D-1)) * init["tstep3D"]
+    init["tst"] = init["day0"] .+ (collect(1:ntst) .- 0.5) * init["tstepst"]
     init["nt2D"] = nt; init["it"] = it;
 
     if nt == 1; init["2Dsep"] = true; else; init["2Dsep"] = false end
