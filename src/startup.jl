@@ -235,18 +235,20 @@ function samstartup(;
 
 
     if loadinit && isfile("$(sroot["raw"])/init.jld2")
+        @info "$(Dates.now()) - Extracting project information from init.jld2 file in the RAW directory $(sroot["raw"]) ..."
         @load "$(sroot["raw"])/init.jld2" init
         _,f3D,f2D,fst = retrievename(fname,tmppath);
         sroot["flist3D"] = f3D; sroot["flist2D"] = f2D; sroot["flistst"] = fst
     else
         if isdir(tmppath)
+            @info "$(Dates.now()) - Overwriting project information in init.jld2 file at the RAW directory $(sroot["raw"]) ..."
             init,f3D,f2D,fst = retrievename(fname,tmppath);
             sroot["flist3D"] = f3D; sroot["flist2D"] = f2D; sroot["flistst"] = fst
             retrievedims!(init,f3D); retrievetime!(init,f3D,f2D,fst,it)
             extractpressure!(init,f3D,sroot)
             @save "$(sroot["raw"])/init.jld2" init
         else
-            error("$(Dates.now()) - Unable to retrieve information required for initialization.  Please ensure you have specified the correct project directories, or compiled the information from the temporary SAM data storage folder.")
+            error("$(Dates.now()) - The init.jld2 file in the RAW directory $(sroot["raw"]) and temporary data folders in $tmppath do not exist and therefore project information cannot be retrieved. Please check and see if the tmppath and/or prjpath variables are correct")
         end
     end
 
