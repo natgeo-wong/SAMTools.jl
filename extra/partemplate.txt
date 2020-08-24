@@ -50,7 +50,7 @@ s3D,cld_ice_rad,REI,Effective Radius for Cloud Ice,mkm
 s3D,cld_liq_rad,REI,Effective Radius for Cloud Liquid,mkm
 
 # CALCULATED SURFACE PARAMETERS
-c2D,
+c2D,ebal_sfc,NA,Surface Energy Balance,W/m/m
 
 # CALCULATED PRESSURE PARAMETERS
 c3D,
