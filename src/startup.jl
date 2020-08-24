@@ -141,8 +141,8 @@ function retrievetimest!(
     init["day0"] = tste - (tste-tst1)/(ntst-1) * (ntst - 0.5)
     init["dayh"] = mod(init["day0"],1)
     init["tstepst"] = (tste - tst1) / (ntst - 1)
-    init["tst"] = init["day0"] .+ (collect(1:ntst) .- 0.5) * init["tstepst"]
-    init["it"] = it;
+    init["tst"]  = init["day0"] .+ (collect(1:ntst) .- 0.5) * init["tstepst"]
+    init["ntst"] = nt1; init["it"] = it;
 
 end
 

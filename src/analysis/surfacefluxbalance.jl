@@ -31,16 +31,16 @@ end
 function radbaldomain(init::AbstractDict,sroot::AbstractDict)
 
     _,separ,setime = saminitialize(init,modID="c2D",parID="ebal_sfc");
-    ntst = length(setime["tst"])
+    ntst = length(setime["tst"]); fst = sroot["flistst"]; nfnc = length(fst)
     sw = zeros(ntst); lw = zeros(ntst); sh = zeros(ntst); lh = zeros(ntst);
 
-    for inc = 1 : length(fst)
+    for inc = 1 : nfnc
 
         @info "$(Dates.now()) - Extracting surface fluxes from OUT_STAT file $inc ..."
         ds = NCDataset(fst[inc])
 
-        beg = (inc-1)*nt1+1
-        if inc != nfnc; fin = inc*snt1
+        beg = (inc-1)*setime["ntst"]+1
+        if inc != nfnc; fin = inc*setime["ntst"]
               sw[beg:fin] .= ds["SWNS"][:]; sh[beg:fin] .= ds["SHF"][:]
               lw[beg:fin] .= ds["LWNS"][:]; lh[beg:fin] .= ds["LHF"][:]
         else; sw[beg:end] .= ds["SWNS"][:]; sh[beg:end] .= ds["SHF"][:]
@@ -96,7 +96,6 @@ end
 function radbalsave(
     radbal::Vector{<:Real},
     sw::Vector{<:Real}, lw::Vector{<:Real}, sh::Vector{<:Real}, lh::Vector{<:Real},
-    tt::Vector{<:Real},
     spar::AbstractDict, stime::AbstractDict, sroot::AbstractDict
 )
 
@@ -113,7 +112,7 @@ function radbalsave(
         "Date Created" => "$(Dates.now())"
     ))
 
-    ds.dim["t"] = length(setime["tst"])
+    ds.dim["t"] = length(stime["tst"])
 
     nct = defVar(ds,"t",Float64,("t",),attrib = Dict(
         "units"     => "days since 0000-00-00 00:00:00.0",
@@ -126,27 +125,27 @@ function radbalsave(
         "long_name"     => spar["name"],
     ))
 
-    ncsw = defVar(ds,sw_net_sfc,Float32,("t",),attrib = Dict(
+    ncsw = defVar(ds,"sw_net_sfc",Float32,("t",),attrib = Dict(
         "units"         => spar["unit"],
         "long_name"     => "Net Shortwave at Surface",
     ))
 
-    nclw = defVar(ds,lw_net_sfc,Float32,("t",),attrib = Dict(
+    nclw = defVar(ds,"lw_net_sfc",Float32,("t",),attrib = Dict(
         "units"         => spar["unit"],
         "long_name"     => "Net Longwave at Surface",
     ))
 
-    ncsh = defVar(ds,hflux_s,Float32,("t",),attrib = Dict(
+    ncsh = defVar(ds,"hflux_s",Float32,("t",),attrib = Dict(
         "units"         => spar["unit"],
         "long_name"     => "Sensible Heat Flux",
     ))
 
-    nclh = defVar(ds,hflux_l,Float32,("t",),attrib = Dict(
+    nclh = defVar(ds,"hflux_l",Float32,("t",),attrib = Dict(
         "units"         => spar["unit"],
         "long_name"     => "Latent Heat Flux",
     ))
 
-    nct[:] = setime["tst"]
+    nct[:] = stime["tst"]
     ncv[:] = radbal; ncsw[:] = sw; nclw[:] = lw; ncsh[:] = sh; nclh[:] = lh;
 
     close(ds)
