@@ -116,8 +116,14 @@ function sammodule(moduleID::AbstractString,init::AbstractDict)
         smod["levels"] = init["z"]
     end
 
-    smod["x"] = init["x"]; smod["y"] = init["y"]; smod["z"] = init["z"];
-    smod["size"] = init["size"]; smod["2Dsep"] = init["2Dsep"]
+    if haskey(init,"x")
+        smod["x"] = init["x"]; smod["y"] = init["y"];
+        smod["size"] = init["size"]; smod["2Dsep"] = init["2Dsep"]
+    end
+
+    if haskey(init,"z")
+        smod["z"] = init["z"];
+    end
 
     return smod
 
@@ -182,7 +188,14 @@ end
 function samtime(init)
 
     stime = deepcopy(init);
-    delete!(stime,"x"); delete!(stime,"y"); delete!(stime,"z"); delete!(stime,"size");
+
+    if haskey(stime,"x")
+        delete!(stime,"x"); delete!(stime,"y"); delete!(stime,"size");
+    end
+
+    if haskey(stime,"z")
+        delete!(stime,"z");
+    end
 
     return stime
 
