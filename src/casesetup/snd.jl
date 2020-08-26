@@ -65,22 +65,12 @@ function snduv!(
 
 end
 
-function sndcopy(fsnd::AbstractString;overwrite::Bool=true)
-
-    ftem = joinpath(@__DIR__,"../extra/snd")
-
-    if overwrite || !isfile(fsnd)
-        @debug "$(Dates.now()) - Unable to find sounding file, copying data from SAMTools repository ..."
-        cp(ftem,fsnd,force=true);
-    end
-
-end
-
 function sndprint(fsnd::AbstractString,snddata::Array{<:Real,2},p::Real)
 
     nz = size(snddata,1)
 
-    sndcopy(fsnd); open(fsnd,"a") do io
+    open(fsnd,"w") do io
+        @printf(io,"      z[m]      p[mb]      tp[K]    q[g/kg]     u[m/s]     v[m/s]\n")
         @printf(io,"%10.2f, %10d, %10.2f\n",0.00,nz,p)
     end
 

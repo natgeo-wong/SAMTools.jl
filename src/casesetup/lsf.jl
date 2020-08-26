@@ -29,22 +29,12 @@ function lsfinit(
 
 end
 
-function lsfcopy(flsf::AbstractString;overwrite::Bool=true)
-
-    ftem = joinpath(@__DIR__,"../extra/lsf")
-
-    if overwrite || !isfile(flsf)
-        @debug "$(Dates.now()) - Unable to find baseline large-scale forcing file, copying data from SAMTools repository ..."
-        cp(ftem,flsf,force=true);
-    end
-
-end
-
 function lsfprint(flsf::AbstractString,lsf::Array{<:Real,2},p::Real)
 
     nz = size(lsf,1)
 
-    lsfcopy(flsf); open(flsf,"a") do io
+    open(flsf,"w") do io
+        @printf(io,"  z[m] p[mb] tpls[K/s] qls[kg/kg/s] uls_hor vls_hor wls[m/s]\n")
         @printf(io,"%10.2f, %10d, %10.2f\n",0.00,nz,p)
     end
 
