@@ -12,7 +12,7 @@ Limitations:
     - the only way to specify multiple values of zonal/meridional wind soundings at different levels is to use a sounding file, one each for u- and v- winds
 """
 
-function samstat2snd(
+function stat2snd(
     sroot::AbstractDict,
     ndays::Integer=0
 )
@@ -100,7 +100,7 @@ function sndprint(fsnd::AbstractString,snddata::Array{<:Real,2},p::Real)
 
 end
 
-function samsnd(
+function samstat2snd(
     fsnd::AbstractString="snd";
     tmppath::AbstractString="", prjpath::AbstractString,
     experiment::AbstractString="", config::AbstractString, fname::AbstractString,
@@ -116,7 +116,7 @@ function samsnd(
         welcome=false
     )
 
-    snddata,p = samstat2snd(sroot,ndays); z = @view snddata[:,1];
+    snddata,p = stat2snd(sroot,ndays); z = @view snddata[:,1];
     if usnd != 0; snduv!(snddata[:,5],z,usnd,uzlow,uzhigh) end
     if vsnd != 0; snduv!(snddata[:,6],z,vsnd,vzlow,vzhigh) end
 
@@ -124,5 +124,26 @@ function samsnd(
     if vsndfile != ""; snduv!(snddata[:,6],z,vsndfile) end
 
     sndprint(fsnd,snddata,p)
+
+end
+
+function sndinit(
+    nvert::Integer=0;
+    ispre::Bool=true, isvert::Bool=false, ishybrid::Bool=false
+)
+
+    if nvert == 0
+        snd = zeros(37,6); snd[:,1] .= -999.0
+        snd[:,2] .= [
+            1000.0,975.0,950.0,925.0,900.0,875.0,850.0,825.0,800.0,775.0,750.0,
+            700.0,650.0,600.0,550.0,500.0,450.0,400.0,350.0,300.0,250.0,
+            225.0,200.0,175.0,150.0,125.0,100.0,
+            70.0,50.0,30.0,20.0,10.0,7.0,5.0,3.0,2.0,1.0
+        ]
+    else
+        snd = zeros(nvert,7); snd[:,1] .= -999.0
+    end
+
+    return snd
 
 end
