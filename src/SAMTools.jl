@@ -15,12 +15,14 @@ using Statistics
 
 ## Exporting the following functions:
 export
-        samwelcome, samstartup, saminitialize, samresort, samanalysis, samroot, samsnd,
+        samwelcome, samstartup, saminitialize, samresort, samanalysis, samroot,
         samparametercopy, samparameterload, samparameteradd,
         samrawfolder, samrawname, samrawread,
         sampre2lvl, samvert2lvl,
+        sndinit, sndprint, samstat2snd,
         lsfinit, lsfprint,
-        radiationbalance, radbalname
+        sfcradbal, sfcradbalname
+        #toaradbal, toaradbalname
 
 ## Including other files in the module
 include("startup.jl")
@@ -33,5 +35,6 @@ include("casesetup/snd.jl")
 include("casesetup/lsf.jl")
 
 include("analysis/surfacefluxbalance.jl")
+# include("analysis/topofatmosbalance.jl")
 
 end
