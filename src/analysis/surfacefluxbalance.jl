@@ -4,7 +4,7 @@ This file contains functions to compute the radiative balance at the surface to 
     - domain-averaged format, taken from STAT output
 """
 
-function radiationbalance(
+function sfcradbal(
     config::AbstractString,
     experiment::AbstractString="";
     tmppath::AbstractString="",
@@ -22,13 +22,13 @@ function radiationbalance(
         loadinit=loadinit,welcome=false
     )
 
-    radbaldomain(init,sroot)
+    sfcradbaldomain(init,sroot)
 
-    if do2D; radbal2D(init,sroot) end
+    if do2D; sfcradbal2D(init,sroot) end
 
 end
 
-function radbaldomain(init::AbstractDict,sroot::AbstractDict)
+function sfcradbaldomain(init::AbstractDict,sroot::AbstractDict)
 
     _,separ,setime = saminitialize(init,modID="c2D",parID="ebal_sfc");
     ntst = length(setime["tst"]); fst = sroot["flistst"]; nfnc = length(fst)
@@ -52,11 +52,11 @@ function radbaldomain(init::AbstractDict,sroot::AbstractDict)
     end
 
     rb = sw .- (lw .+ sh .+ lh)
-    radbalsave(rb,sw,lw,sh,lh,separ,setime,sroot)
+    sfcradbalsave(rb,sw,lw,sh,lh,separ,setime,sroot)
 
 end
 
-function radbal2D(init::AbstractDict,sroot::AbstractDict)
+function sfcradbal2D(init::AbstractDict,sroot::AbstractDict)
 
     samresort(init,sroot,modID="r2D",parID="hflux_s")
     samresort(init,sroot,modID="r2D",parID="hflux_l")
@@ -87,13 +87,13 @@ function radbal2D(init::AbstractDict,sroot::AbstractDict)
 
         seb = sw .- (lw .+ sh .+ lh)
 
-        radbalsave(seb,ifnc,semod,separ,setime,sroot)
+        sfcradbalsave(seb,ifnc,semod,separ,setime,sroot)
 
     end
 
 end
 
-function radbalsave(
+function sfcradbalsave(
     radbal::Vector{<:Real},
     sw::Vector{<:Real}, lw::Vector{<:Real}, sh::Vector{<:Real}, lh::Vector{<:Real},
     spar::AbstractDict, stime::AbstractDict, sroot::AbstractDict
@@ -154,7 +154,7 @@ function radbalsave(
 
 end
 
-function radbalsave(
+function sfcradbalsave(
     radbal::Array{<:Real,3}, inc::Integer,
     smod::AbstractDict, spar::AbstractDict, stime::AbstractDict,
     sroot::AbstractDict
@@ -197,4 +197,4 @@ function radbalsave(
 
 end
 
-radbalname(sroot::AbstractDict) = joinpath(sroot["ana"],"sfcflux.nc");
+sfcradbalname(sroot::AbstractDict) = joinpath(sroot["ana"],"sfcflux.nc");
