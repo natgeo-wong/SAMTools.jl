@@ -1,5 +1,5 @@
 <p align="center">
-<img alt="SAMTools.jl Logo" src=# />
+<img alt="SAMTools.jl Logo" src=https://github.com/natgeo-wong/SAMTools.jl/blob/main/logosmall.png?raw=true/>
 </p>
 
 # **<div align="center">SAMTools.jl</div>**
