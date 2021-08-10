@@ -13,10 +13,18 @@ using Statistics
 
 ## Exporting the following functions:
 export
-        a
+        templaterun, templateexp, templatehpc, overwritetemplate,
+        sammakefile, sammodules, samscratch
+
+
+function __init__()
+    samfol = joinpath(DEPOT_PATH[1],"files","SAMTools")
+    if !isdir(samfol); mkpath(samfol) end
+    overwritetemplate()
+end
 
 ## Including other files in the module
-include()
+include("setup.jl")
 
 # include("analysis/topofatmosbalance.jl")
 
