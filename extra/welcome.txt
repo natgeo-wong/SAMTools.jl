@@ -1,8 +1,0 @@
-                                       SAMTools.jl
-                            Created by: Nathanael Zhixin Wong
-
-SAMTools is a Julia package specifically designed to automate post-processing and analysis of SAM (System of Atmospheric Modeling) Output.
-
-If you wish to contribute to SAMTools.jl, please contact me at:
-- nathanaelwong@fas.harvard.edu
-- or you can also submit a pull-request if you've already created something!

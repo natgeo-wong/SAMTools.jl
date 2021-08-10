@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# {HPC}
+
+module purge
+{module load}
+
+cd ./OUT_3D
+
+for fbin3D in *.bin3D
+do
+    if bin3D2nc "$fbin3D" >& /dev/null
+    then
+        echo "Processing SAM bin3D output file $fbin3D ... done"
+        rm "$fbin3D"
+    else
+        echo "Processing SAM bin3D output file $fbin3D ... failed"
+    fi
+done
+
+cd ../OUT_2D
+
+for f2Dbin in *.2Dbin
+do
+    if 2Dbin2nc "$f2Dbin" >& /dev/null
+    then
+        echo "Processing SAM 2Dcom output file $f2Dbin ... done"
+        rm "$f2Dbin"
+    else
+        echo "Processing SAM 2Dcom output file $f2Dbin ... failed"
+    fi
+done
+
+cd ../OUT_STAT
+
+for fstat in *.stat
+do
+    if stat2nc "$fstat" >& /dev/null
+    then
+        echo "Processing SAM 2Dcom output file $fstat ... done"
+        rm "$fstat"
+    else
+        echo "Processing SAM 2Dcom output file $fstat ... failed"
+    fi
+done
+
+cd ..
+
+exit 0

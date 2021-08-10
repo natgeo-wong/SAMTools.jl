@@ -1,0 +1,11 @@
+#! /bin/bash -f
+
+# Load the modules before running Build
+echo Loading modules ... takes half a minute ...
+
+module purge
+{module load}
+
+./Build.csh >& Build.log &  #TODO
+echo Build submitted in background
+echo Writing logs in Build.log
