@@ -43,7 +43,7 @@ setenv GNUMAKE 'make -j8'
 setenv SAM_DIR  `pwd`
 setenv SAM_OBJ  $SAM_SCR/OBJ
 #setenv SAM_SRC  `pwd`/SRC
-setenv SAM_SRC
+setenv SAM_SRC  {samsourcedir}
 
 if !(-d $SAM_SCR) mkdir -p $SAM_SCR
 
