@@ -1,26 +1,18 @@
 #!/bin/sh
 
-# {HPC}
+[HPC/SLURM]
 
 module purge
-{module load}
+module load [modules]
 
-case=RCE
-project={projectname}
-experiment={expname}
-config={configname}
-sndname={sndtemplate}
-lsfname={lsftemplate}
+exproot=[expdir]
+prmfile=$exproot/prm/[prmname].prm
+sndfile=$exproot/snd/[sndname].snd
+lsffile=$exproot/lsf/[lsfname].lsf
 
-
-exproot={scratch}/{projectname}/data/{expname}/{configname}/exp
-prmfile=$exproot/prm/$experiment/${config}.prm
-sndfile=$exproot/snd/$sndname
-lsffile=$exproot/lsf/$lsfname
-
-prmloc=./$case/prm
-sndloc=./$case/snd
-lsfloc=./$case/lsf
+prmloc=./SAM/prm
+sndloc=./SAM/snd
+lsfloc=./SAM/lsf
 
 cp $prmfile $prmloc
 cp $sndfile $sndloc
@@ -30,15 +22,15 @@ scriptdir=$SLURM_SUBMIT_DIR
 SAMname=`ls $scriptdir/SAM_*`
 
 cd $scriptdir
-export OMPI_MCA_btl="self,openib"
-time srun -n $SLURM_NTASKS --mpi=pmi2 --cpu_bind=cores --hint=compute_bound $SAMname > ./LOGS/samrun.${SLURM_JOBID}.log
+[mpirun_extras]
+[mpirun] $SAMname > ./LOGS/samrun.${SLURM_JOBID}.log
 
 exitstatus=$?
 echo SAM stopped with exit status $exitstatus
 
 cd ./OUT_3D
 
-for fbin3D in *.bin3D
+for fbin3D in *$ensemblemember*.bin3D
 do
     if bin3D2nc "$fbin3D" >& /dev/null
     then
@@ -49,7 +41,7 @@ do
     fi
 done
 
-for fbin2D in *.bin2D
+for fbin2D in *$ensemblemember*.bin2D
 do
     if bin2D2nc "$fbin2D" >& /dev/null
     then
@@ -62,7 +54,7 @@ done
 
 cd ../OUT_2D
 
-for f2Dbin in *.2Dbin
+for f2Dbin in *$ensemblemember*.2Dbin
 do
     if 2Dbin2nc "$f2Dbin" >& /dev/null
     then
@@ -75,7 +67,7 @@ done
 
 cd ../OUT_STAT
 
-for fstat in *.stat
+for fstat in *$ensemblemember*.stat
 do
     if stat2nc "$fstat" >& /dev/null
     then

@@ -1,18 +1,16 @@
 &PARAMETERS
 
-caseid = '{projectname}-{expname}-member{mxx}',
+caseid = '[project]-[experiment]',
 
 dx = 1000.,
 dy = 1000.,
 dt = 30.,
 
-doensemble    = .true.,
-nensemble     = {mxx},
 nrestart      = 0,
-nrestart_skip = 239,
+nrestart_skip = 23,
 perturb_type  = 0,
 
-CEM   = .true.,
+LES_S = .false.,
 OCEAN = .true.,
 
 dosgs            = .true.,
@@ -31,7 +29,6 @@ docoriolis       = .false.,
 donudging_uv     = .false.,
 donudging_tq     = .false.,
 
-timelargescale = 0
 tauls = 3600.,
 
 SFC_FLX_FXD    = .false.,
@@ -39,7 +36,7 @@ SFC_TAU_FXD    = .false.,
 
 longitude0 = 0.,
 latitude0  = 0.,
-day0       = 80.5,
+day0       = 0.,
 tabs_s     = 300.00,
 Szero      = 0,
 
@@ -61,7 +58,7 @@ doisccp = .false.,
 domodis = .false.,
 domisr  = .false.,
 
-nstop    = 4320000,
+nstop    = 28800,
 nprint   = 2880,
 nstat    = 2880,    ! Calculate statistics every hour!
 nstatfrq = 288,     ! Collect 60 samples per statistical calculation (every 1 minute)
@@ -69,16 +66,13 @@ nstatfrq = 288,     ! Collect 60 samples per statistical calculation (every 1 mi
 doSAMconditionals     = .false.,
 dosatupdnconditionals = .false.,
 
-nsave2D      = 180,
-nsave2Dstart = 9999999,
+nsave2D      = 2880,
+nsave2Dstart = 0,
 nsave2Dend   = 999999999,
-save2Dbin    = .true.,
-save2Davg    = .true.,
 
-nsave3D      = 180,
-nsave3Dstart = 9999999,
+nsave3D      = 2880,
+nsave3Dstart = 0,
 nsave3Dend   = 999999999,
-save3Dbin    = .true.,
 rad3Dout     = .true.,
 
 /

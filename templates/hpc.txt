@@ -3,7 +3,6 @@
 #SBATCH -N {nodes} # number of nodes
 #SBATCH -n {cores} # number of cores
 #SBATCH --mem-per-cpu={memory} # memory pool for each core
-#SBATCH --hint=compute_bound
 #SBATCH -t {D}-{HH}:{MM} # time (D-HH:MM)
 
 #SBATCH -J "SAM_run"

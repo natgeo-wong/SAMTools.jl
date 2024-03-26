@@ -3,7 +3,7 @@
 # {HPC}
 
 module purge
-{module load}
+[module load]
 
 cd ./OUT_3D
 

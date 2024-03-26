@@ -4,7 +4,7 @@
 echo Loading modules ... takes half a minute ...
 
 module purge
-{module load}
+[module load]
 
 ./Build.csh >& Build.log &  #TODO
 echo Build submitted in background

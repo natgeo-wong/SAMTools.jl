@@ -2,31 +2,29 @@
 
 # specify the scratch directory where object files as well as
 # restart and large output data file will be located :
-
-#setenv SAM_SCR `pwd`
-setenv SAM_SCR {scratch}/{projectname}/data/{expname}/{configname}
+setenv SAM_SCR [project]/data/[experiment]
 
 # ----------------------------------
 # specify scalar-advection directory in SRC
 setenv ADV_DIR ADV_UM5
-#setenv ADV_DIR ADV_MPDATA
-#setenv ADV_DIR ADV_SELPPM
+# setenv ADV_DIR ADV_MPDATA
+# setenv ADV_DIR ADV_SELPPM
 
 # specify SGS directory in SRC
 setenv SGS_DIR SGS_TKE
 
 # specify radiation directory in SRC
-#setenv RAD_DIR RAD_CAM
+# setenv RAD_DIR RAD_CAM
 setenv RAD_DIR RAD_RRTM
-#setenv RAD_DIR RAD_RRTM4PBL
+# setenv RAD_DIR RAD_RRTM4PBL
 
 # specify microphysics directory in SRC
 setenv MICRO_DIR MICRO_SAM1MOM
-#setenv MICRO_DIR MICRO_M2005
-#setenv MICRO_DIR MICRO_WRF # This is Thompson et al (2008)
-#setenv MICRO_DIR MICRO_DRIZZLE
-#setenv MICRO_DIR MICRO_P3
-#setenv MICRO_DIR MICRO_THOM
+# setenv MICRO_DIR MICRO_M2005
+# setenv MICRO_DIR MICRO_WRF # This is Thompson et al (2008)
+# setenv MICRO_DIR MICRO_DRIZZLE
+# setenv MICRO_DIR MICRO_P3
+# setenv MICRO_DIR MICRO_THOM
 
 # ----------------------------------
 # specify (GNU) make utility
@@ -42,8 +40,7 @@ setenv GNUMAKE 'make -j8'
 
 setenv SAM_DIR  `pwd`
 setenv SAM_OBJ  $SAM_SCR/OBJ
-#setenv SAM_SRC  `pwd`/SRC
-setenv SAM_SRC  {samsourcedir}
+setenv SAM_SRC  [SAM_SRC]
 
 if !(-d $SAM_SCR) mkdir -p $SAM_SCR
 
@@ -56,6 +53,7 @@ if !(-d $SAM_SCR/OUT_STAT) mkdir $SAM_SCR/OUT_STAT
 if !(-d $SAM_SCR/OUT_MOVIES) mkdir $SAM_SCR/OUT_MOVIES
 if !(-d $SAM_SCR/RESTART) mkdir $SAM_SCR/RESTART
 if !(-d $SAM_OBJ) mkdir $SAM_OBJ
+if !(-d LOGS) mkdir LOGS
 
 if !(-d OUT_2D) ln -s $SAM_SCR/OUT_2D  OUT_2D
 if !(-d OUT_3D) ln -s $SAM_SCR/OUT_3D  OUT_3D
@@ -67,7 +65,7 @@ if !(-d OBJ) ln -s $SAM_OBJ  OBJ
 
 
 #--------------------------------------------
-#bloss: add "make clean" if MICRO or RAD options
+# bloss: add "make clean" if MICRO or RAD options
 #        have changed.
 cat > MICRO_RAD_OPTIONS.new <<EOF
 $HOSTNAME
@@ -91,23 +89,18 @@ endif
 mv -f MICRO_RAD_OPTIONS.new $SAM_OBJ/MICRO_RAD_OPTIONS
 #--------------------------------------------
 
-
-
 cd $SAM_OBJ
 
 if ( !(-e Filepath) ) then
 cat >! Filepath << EOF
 $SAM_SRC
+$SAM_SRC/$MICRO_DIR
 $SAM_SRC/$ADV_DIR
 $SAM_SRC/$SGS_DIR
 $SAM_SRC/$RAD_DIR
-$SAM_SRC/$MICRO_DIR
 $SAM_SRC/SIMULATORS
-$SAM_SRC/QUICKBEAM
-$SAM_SRC/TIMING
-$SAM_SRC/LAPACK_BLAS_UTILS
+$SAM_SRC/SLM
 EOF
 endif
-
 
 $GNUMAKE -f $SAM_DIR/Makefile
